@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>robot robot Studio</title>
     
-    <!-- FIX: Loading the single, unified official file so it never crashes -->
-    <script src="https://unpkg.com/blockly"></script>
+    <!-- FIX: Loading the absolute core stable distribution bundle -->
+    <script src="https://unpkg.com/blockly/blockly.min.js"></script>
 
     <style>
         body {
@@ -42,7 +42,7 @@
         /* Left Panel: AI Assistant Chatbot */
         #ai-chat-area { flex: 0.8; background-color: #181818; display: flex; flex-direction: column; border-right: 2px solid #2d2d2d; min-width: 250px; }
         
-        /* Middle Panel Layout Fix: Static wrapper keeps dragging calculations accurate */
+        /* Middle Panel: Blockly Canvas View */
         #blockly-wrapper { 
             flex: 1.6; 
             height: 100%; 
@@ -109,26 +109,29 @@
         </div>
     </div>
 
-    <!-- Toolbox Structure -->
+    <!-- Layout Category XML Node Mapping Framework -->
     <xml id="toolbox" style="display: none">
         <category name="🔌 Basic I/O" colour="#00878f" id="cat_basic"></category>
         <category name="🌡️ Environmental Suite" colour="#2ecc71" id="cat_env"></category>
         <category name="📡 Wireless & Radio" colour="#3498db" id="cat_wireless"></category>
         <category name="⚙️ Robotics & Motors" colour="#e67e22" id="cat_motors"></category>
         <category name="🖥️ Advanced Displays" colour="#e74c3c" id="cat_displays"></category>
-        <category name="🧠 Control Logic" colour="#9b59b6">
-            <block type="controls_if"></block>
-            <block type="logic_compare"></block>
-            <block type="math_number"></block>
+        <category name="🧠 Control Logic" colour="#9b59b6" id="cat_logic">
             <block type="delay_ms"></block>
         </category>
     </xml>
 
     <script>
-        // Use the default JavaScript generator built into Blockly to manage internal framework logic
-        const arduinoGenerator = Blockly.JavaScript;
+        // FIX: Instantiate a clean custom generator constructor directly from the core package
+        const arduinoGenerator = new Blockly.Generator('ARDUINO');
+        
+        // Define operational block compilation hierarchy execution order rules
+        arduinoGenerator.scrub_ = function(block, code, thisOnly) {
+            const nextBlock = block.nextConnection && block.nextConnection.targetBlock();
+            return (nextBlock && !thisOnly) ? code + arduinoGenerator.blockToCode(nextBlock) : code;
+        };
 
-        // --- CORE STANDARD INFRASTRUCTURE BLOCKS ---
+        // --- CORE LOGIC HANDLERS ---
         Blockly.Blocks['delay_ms'] = { init: function() { this.appendDummyInput().appendField("Delay / Wait").appendField(new Blockly.FieldNumber(1000, 0), "MS").appendField("ms"); this.setPreviousStatement(true, null); this.setNextStatement(true, null); this.setColour("#9b59b6"); } };
         arduinoGenerator['delay_ms'] = function(block) { return `  delay(${block.getFieldValue('MS')});\n`; };
 
@@ -177,4 +180,3 @@
         wirelessProtocols.forEach(proto => {
             for(let register = 0; register <= 40; register++) {
                 let bName = `wireless_${proto.toLowerCase()}__reg${register}`;
-                Blockly.Blocks[bName] = { init: function() { this.appendDummyInput().appendField(`[${proto}] Sync Network Config Data Registry 0x${register.toString(16).toUpperCase()}`); this.setPreviousStatement(true, null); this.setNextStatement(true, null); this.setColour("#3498db"); } };
