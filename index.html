@@ -34,14 +34,12 @@
             overflow: hidden;
         }
         
-        /* Left Panel: Chat Assistant */
         #ai-chat-area {
             width: 25vw; min-width: 280px; max-width: 350px;
             background-color: #181818; display: flex; flex-direction: column;
             border-right: 2px solid #2d2d2d;
         }
         
-        /* Middle Panel: Local Clickable Code Builder Block Grid */
         #block-builder-area {
             flex: 2; height: 100%;
             background-color: #1e1e1e;
@@ -73,7 +71,6 @@
             font-weight: bold; cursor: pointer; font-size: 1.1rem;
         }
         
-        /* Right Panel: Live Arduino Code text */
         #code-area {
             width: 25vw; min-width: 280px; max-width: 350px;
             background-color: #1e1e1e; border-left: 2px solid #2d2d2d;
@@ -117,14 +114,19 @@
             </div>
         </div>
 
-        <!-- 2. MIDDLE PANEL: Pure Local HTML Block Builder Canvas (No CDNs!) -->
+        <!-- 2. MIDDLE PANEL: Pure Local HTML Block Builder Canvas -->
         <div id="block-builder-area">
             <div class="toolbox-bar">
-                <button class="tool-btn" style="background-color: #2ecc71;" onclick="addBlock('pir')">🏃 Add Motion Eye Block</button>
-                <button class="tool-btn" style="background-color: #1abc9c;" onclick="addBlock('distance')">📏 Add Distance Radar Block</button>
-                <button class="tool-btn" style="background-color: #3498db;" onclick="addBlock('light')">👁️ Add Light Eye Block</button>
-                <button class="tool-btn" style="background-color: #e74c3c;" onclick="addBlock('buzz')">🔊 Add Noise Maker Block</button>
-                <button class="tool-btn" style="background-color: #9b59b6;" onclick="addBlock('wait')">⏱️ Add Timer Wait Block</button>
+                <button class="tool-btn" style="background-color: #2ecc71;" onclick="addBlock('pir')">🏃 Motion Eye</button>
+                <button class="tool-btn" style="background-color: #1abc9c;" onclick="addBlock('distance')">📏 Distance Radar</button>
+                <button class="tool-btn" style="background-color: #3498db;" onclick="addBlock('light')">👁️ Light Eye</button>
+                <button class="tool-btn" style="background-color: #f1c40f; color: #121212;" onclick="addBlock('temp')">🌡️ Thermometer</button>
+                <button class="tool-btn" style="background-color: #1abc9c;" onclick="addBlock('water')">💧 Water Drop Sensor</button>
+                <button class="tool-btn" style="background-color: #7f8c8d;" onclick="addBlock('button')">🔘 Big Button</button>
+                <button class="tool-btn" style="background-color: #e74c3c;" onclick="addBlock('buzz')">🔊 Noise Maker ON</button>
+                <button class="tool-btn" style="background-color: #e67e22;" onclick="addBlock('led_on')">💡 Red Light ON</button>
+                <button class="tool-btn" style="background-color: #d35400;" onclick="addBlock('led_off')">💤 Red Light OFF</button>
+                <button class="tool-btn" style="background-color: #9b59b6;" onclick="addBlock('wait')">⏱️ Wait 3 Seconds</button>
             </div>
             <div class="canvas-grid" id="canvasGrid">
                 <!-- Clicked blocks will instantly render here dynamically -->
@@ -139,7 +141,6 @@
     </div>
 
     <script>
-        // Track blocks in a simple array
         let activeBlocks = [];
 
         function addBlock(type) {
@@ -154,7 +155,7 @@
 
         function renderBlocks() {
             const grid = document.getElementById('canvasGrid');
-            grid.innerHTML = ''; // Clear canvas
+            grid.innerHTML = ''; 
             
             let arduinoLoopCode = '';
 
@@ -170,48 +171,31 @@
                 } else if(block === 'distance') {
                     blockDiv.style.backgroundColor = '#1abc9c';
                     label = "📏 IF Radar Sensor tracks something close:";
-                    arduinoLoopCode += "  if (analogRead(A0) > 400) {\n";
+                    arduinoLoopCode += "  if (getDistance() < 15) {\n";
                 } else if(block === 'light') {
                     blockDiv.style.backgroundColor = '#3498db';
                     label = "👁️ IF Light Eye Sensor says it is Dark:";
                     arduinoLoopCode += "  if (analogRead(A1) < 300) {\n";
+                } else if(block === 'temp') {
+                    blockDiv.style.backgroundColor = '#f1c40f'; blockDiv.style.color = '#121212';
+                    label = "🌡️ IF Thermometer feels Hot:";
+                    arduinoLoopCode += "  if (analogRead(A2) > 150) {\n";
+                } else if(block === 'water') {
+                    blockDiv.style.backgroundColor = '#1abc9c';
+                    label = "💧 IF Moisture Sensor touches water:";
+                    arduinoLoopCode += "  if (analogRead(A0) > 400) {\n";
+                } else if(block === 'button') {
+                    blockDiv.style.backgroundColor = '#7f8c8d';
+                    label = "🔘 IF Big Button is pressed:";
+                    arduinoLoopCode += "  if (digitalRead(4) == LOW) {\n";
                 } else if(block === 'buzz') {
                     blockDiv.style.backgroundColor = '#e74c3c';
                     label = "▶️ THEN DO: 🔊 Turn Noise Maker ON";
                     arduinoLoopCode += "    digitalWrite(3, HIGH);\n";
-                } else if(block === 'wait') {
-                    blockDiv.style.backgroundColor = '#9b59b6';
-                    label = "⏱️ Keep doing this loop action for 3 seconds";
-                    arduinoLoopCode += "    delay(3000);\n";
-                }
-
-                blockDiv.innerHTML = `<span>${label}</span><button class="remove-block-btn" onclick="removeBlock(${index})">❌</button>`;
-                grid.appendChild(blockDiv);
-            });
-
-            // Automatically close braces for conditions cleanly
-            let closingBraces = '';
-            let openBraceCount = (arduinoLoopCode.match(/\{/g) || []).length;
-            for(let i=0; i<openBraceCount; i++) {
-                closingBraces += "  }\n";
-            }
-            if(openBraceCount > 0 && !activeBlocks.includes('buzz')) {
-                // Default fallback fallback reset
-                arduinoLoopCode += "    digitalWrite(3, LOW);\n";
-            }
-
-            // Print Compiled Arduino Framework string
-            document.getElementById('code-output').innerText = 
-`void setup() {
-  pinMode(2, INPUT);   // 🏃 Motion Sensor
-  pinMode(3, OUTPUT);  // 🔊 Buzzer Pin
-}
-
-void loop() {
-${arduinoLoopCode}${closingBraces || '  // Click upper buttons to chain code modules!'}\n}`;
-        }
-
-        function copyArduinoCode() { navigator.clipboard.writeText(document.getElementById('code-output').innerText); alert("Copied!"); }
-        function handleChatKey(event) { if (event.key === 'Enter') sendChatMessage(); }
-        
-        function sendChatMessage() {
+                } else if(block === 'led_on') {
+                    blockDiv.style.backgroundColor = '#e67e22';
+                    label = "▶️ THEN DO: 💡 Turn Red Light ON";
+                    arduinoLoopCode += "    digitalWrite(13, HIGH);\n";
+                } else if(block === 'led_off') {
+                    blockDiv.style.backgroundColor = '#d35400';
+                    label = "▶️ THEN DO: 💤 Turn Red Light OFF";
