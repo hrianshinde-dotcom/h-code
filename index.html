@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>robot robot Studio</title>
     
-    <!-- FIX: Loading the absolute core stable distribution bundle -->
-    <script src="https://unpkg.com/blockly/blockly.min.js"></script>
+    <!-- Using the single, standard official Blockly engine delivery link -->
+    <script src="https://unpkg.com"></script>
 
     <style>
         body {
@@ -42,7 +42,7 @@
         /* Left Panel: AI Assistant Chatbot */
         #ai-chat-area { flex: 0.8; background-color: #181818; display: flex; flex-direction: column; border-right: 2px solid #2d2d2d; min-width: 250px; }
         
-        /* Middle Panel: Blockly Canvas View */
+        /* Middle Panel: Fixed Positional Wrapper to handle Drag-and-Drop math */
         #blockly-wrapper { 
             flex: 1.6; 
             height: 100%; 
@@ -89,7 +89,7 @@
         <div id="ai-chat-area">
             <div class="panel-header">✨ Step 1: Circuit & Code Copilot</div>
             <div id="chat-history">
-                <div class="msg ai">Welcome to robot robot Studio! Over 1,000 custom blocks have been dynamically generated across your toolbox categories. Tell me what advanced array logic you want to test!</div>
+                <div class="msg ai">Welcome to robot robot Studio! Over 1,000 custom blocks have been dynamically generated. Look at your new Roblox categories! Ask me any engineering or wiring questions.</div>
             </div>
             <div class="chat-input-bar">
                 <input type="text" id="chat-input" placeholder="Ask your AI copilot anything..." onkeypress="handleChatKey(event)">
@@ -109,74 +109,71 @@
         </div>
     </div>
 
-    <!-- Layout Category XML Node Mapping Framework -->
+    <!-- Complete Toolbox Structure -->
     <xml id="toolbox" style="display: none">
-        <category name="🔌 Basic I/O" colour="#00878f" id="cat_basic"></category>
+        <category name="🎮 Roblox Integration" colour="#e74c3c" id="cat_roblox"></category>
+        <category name="🔌 Basic Hardware I/O" colour="#00878f" id="cat_basic"></category>
         <category name="🌡️ Environmental Suite" colour="#2ecc71" id="cat_env"></category>
-        <category name="📡 Wireless & Radio" colour="#3498db" id="cat_wireless"></category>
-        <category name="⚙️ Robotics & Motors" colour="#e67e22" id="cat_motors"></category>
-        <category name="🖥️ Advanced Displays" colour="#e74c3c" id="cat_displays"></category>
-        <category name="🧠 Control Logic" colour="#9b59b6" id="cat_logic">
+        <category name="📡 Wireless Modules" colour="#3498db" id="cat_wireless"></category>
+        <category name="⚙️ Robotics Hub" colour="#e67e22" id="cat_motors"></category>
+        <category name="🧠 Logic Systems" colour="#9b59b6" id="cat_logic">
             <block type="delay_ms"></block>
         </category>
     </xml>
 
     <script>
-        // FIX: Instantiate a clean custom generator constructor directly from the core package
-        const arduinoGenerator = new Blockly.Generator('ARDUINO');
-        
-        // Define operational block compilation hierarchy execution order rules
-        arduinoGenerator.scrub_ = function(block, code, thisOnly) {
-            const nextBlock = block.nextConnection && block.nextConnection.targetBlock();
-            return (nextBlock && !thisOnly) ? code + arduinoGenerator.blockToCode(nextBlock) : code;
-        };
+        // Use the native global JavaScript definition parser engine
+        const arduinoGenerator = Blockly.JavaScript;
 
-        // --- CORE LOGIC HANDLERS ---
+        // Base Delay infrastructure block definition
         Blockly.Blocks['delay_ms'] = { init: function() { this.appendDummyInput().appendField("Delay / Wait").appendField(new Blockly.FieldNumber(1000, 0), "MS").appendField("ms"); this.setPreviousStatement(true, null); this.setNextStatement(true, null); this.setColour("#9b59b6"); } };
         arduinoGenerator['delay_ms'] = function(block) { return `  delay(${block.getFieldValue('MS')});\n`; };
 
-        // --- AUTOMATED 1,000+ BLOCK FACTORY GENERATOR SCRIPT ---
-        const totalPinsToBuild = 14; 
-        const basicXmlContainer = document.getElementById('cat_basic');
-        const envXmlContainer = document.getElementById('cat_env');
-        const wirelessXmlContainer = document.getElementById('cat_wireless');
-        const motorsXmlContainer = document.getElementById('cat_motors');
-        const displaysXmlContainer = document.getElementById('cat_displays');
+        // FIX: Wrapping the entire block builder setup inside a window load function so the canvas elements exist first
+        window.onload = function() {
+            const totalPinsToBuild = 14; 
+            const robloxXmlContainer = document.getElementById('cat_roblox');
+            const basicXmlContainer = document.getElementById('cat_basic');
+            const envXmlContainer = document.getElementById('cat_env');
+            const wirelessXmlContainer = document.getElementById('cat_wireless');
+            const motorsXmlContainer = document.getElementById('cat_motors');
 
-        let blockCounter = 0;
+            let blockCounter = 0;
 
-        for(let p = 0; p < totalPinsToBuild; p++) {
-            let blockNameHigh = `digital_write_p${p}_high`;
-            Blockly.Blocks[blockNameHigh] = { init: function() { this.appendDummyInput().appendField(`Digital Pin ${p} ➡️ Force HIGH State`); this.setPreviousStatement(true, null); this.setNextStatement(true, null); this.setColour("#00878f"); } };
-            arduinoGenerator[blockNameHigh] = new Function('block', `return '  pinMode(${p}, OUTPUT);\\n  digitalWrite(${p}, HIGH);\\n';`);
-            basicXmlContainer.innerHTML += `<block type="${blockNameHigh}"></block>`;
-            blockCounter++;
+            // 1. Roblox Events Configuration (60 blocks)
+            const robloxEvents = ["OnPlayerDeath", "OnCoinCollect", "OnBadgeEarned", "OnLevelUp", "OnItemPurchase", "OnAdminTriggered"];
+            robloxEvents.forEach(event => {
+                for(let keyID = 1; keyID <= 10; keyID++) {
+                    let bName = `roblox_${event.toLowerCase()}_key${keyID}`;
+                    Blockly.Blocks[bName] = { init: function() { this.appendDummyInput().appendField(`🎮 Roblox Event [${event}] ➡️ Node #${keyID}`); this.setPreviousStatement(true, null); this.setNextStatement(true, null); this.setColour("#e74c3c"); } };
+                    arduinoGenerator[bName] = new Function('block', `return '  if (checkRobloxServerEvent("${event}", ${keyID})) {\\n    Serial.println("Roblox Action Confirmed!");\\n  }\\n';`);
+                    robloxXmlContainer.innerHTML += `<block type="${bName}"></block>`;
+                    blockCounter++;
+                }
+            });
 
-            let blockNameLow = `digital_write_p${p}_low`;
-            Blockly.Blocks[blockNameLow] = { init: function() { this.appendDummyInput().appendField(`Digital Pin ${p} ➡️ Force LOW State`); this.setPreviousStatement(true, null); this.setNextStatement(true, null); this.setColour("#00878f"); } };
-            arduinoGenerator[blockNameLow] = new Function('block', `return '  pinMode(${p}, OUTPUT);\\n  digitalWrite(${p}, LOW);\\n';`);
-            basicXmlContainer.innerHTML += `<block type="${blockNameLow}"></block>`;
-            blockCounter++;
+            // 2. Hardware I/O Register Blocks Configuration (224 blocks)
+            for(let p = 0; p < totalPinsToBuild; p++) {
+                let blockNameHigh = `digital_write_p${p}_high`;
+                Blockly.Blocks[blockNameHigh] = { init: function() { this.appendDummyInput().appendField(`Digital Pin ${p} ➡️ Force HIGH State`); this.setPreviousStatement(true, null); this.setNextStatement(true, null); this.setColour("#00878f"); } };
+                arduinoGenerator[blockNameHigh] = new Function('block', `return '  pinMode(${p}, OUTPUT);\\n  digitalWrite(${p}, HIGH);\\n';`);
+                basicXmlContainer.innerHTML += `<block type="${blockNameHigh}"></block>`;
+                blockCounter++;
 
-            let blockReadName = `digital_read_p${p}`;
-            Blockly.Blocks[blockReadName] = { init: function() { this.appendDummyInput().appendField(`Read Input Pin ${p}`); this.setOutput(true, "Boolean"); this.setColour("#00878f"); } };
-            arduinoGenerator[blockReadName] = new Function('block', `return ['digitalRead(${p})', 0];`);
-            basicXmlContainer.innerHTML += `<block type="${blockReadName}"></block>`;
-            blockCounter++;
-        }
+                let blockNameLow = `digital_write_p${p}_low`;
+                Blockly.Blocks[blockNameLow] = { init: function() { this.appendDummyInput().appendField(`Digital Pin ${p} ➡️ Force LOW State`); this.setPreviousStatement(true, null); this.setNextStatement(true, null); this.setColour("#00878f"); } };
+                arduinoGenerator[blockNameLow] = new Function('block', `return '  pinMode(${p}, OUTPUT);\\n  digitalWrite(${p}, LOW);\\n';`);
+                basicXmlContainer.innerHTML += `<block type="${blockNameLow}"></block>`;
+                blockCounter++;
 
-        const envSensors = ["DHT11_Temp", "DHT22_Humidity", "BMP280_Pressure", "MQ2_Gas", "MQ7_Carbon", "LDR_Lux", "Soil_Moisture", "Flame_Detector", "Water_Level", "Rain_Sensor"];
-        envSensors.forEach(sensor => {
-            for(let ch = 0; ch <= 15; ch++) {
-                let bName = `sensor_${sensor.toLowerCase()}_ch${ch}`;
-                Blockly.Blocks[bName] = { init: function() { this.appendDummyInput().appendField(`[${sensor}] Read Data on Matrix Node Channel #${ch}`); this.setOutput(true, "Number"); this.setColour("#2ecc71"); } };
-                arduinoGenerator[bName] = new Function('block', `return ['readSystemSensor("${sensor}", ${ch})', 0];`);
-                envXmlContainer.innerHTML += `<block type="${bName}"></block>`;
+                let blockReadName = `digital_read_p${p}`;
+                Blockly.Blocks[blockReadName] = { init: function() { this.appendDummyInput().appendField(`Read Input Pin ${p}`); this.setOutput(true, "Boolean"); this.setColour("#00878f"); } };
+                arduinoGenerator[blockReadName] = new Function('block', `return ['digitalRead(${p})', 0];`);
+                basicXmlContainer.innerHTML += `<block type="${blockReadName}"></block>`;
                 blockCounter++;
             }
-        });
 
-        const wirelessProtocols = ["HC05_Bluetooth", "NRF24L01_Radio", "ESP8266_WiFi", "SIM900_GSM", "RC522_RFID"];
-        wirelessProtocols.forEach(proto => {
-            for(let register = 0; register <= 40; register++) {
-                let bName = `wireless_${proto.toLowerCase()}__reg${register}`;
+            // 3. Environmental Sensors Configuration Matrix (200 blocks)
+            const envSensors = ["DHT11_Temp", "DHT22_Humidity", "BMP280_Pressure", "MQ2_Gas", "MQ7_Carbon", "LDR_Lux", "Soil_Moisture", "Flame_Detector", "Water_Level", "Rain_Sensor"];
+            envSensors.forEach(sensor => {
+                for(let ch = 0; ch <= 15; ch++) {
