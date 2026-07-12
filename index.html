@@ -3,93 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kids Simple Click-to-Code Studio</title>
+    <title>Advanced Arduino Block Studio Pro</title>
+    <!-- Load Google Blockly Core via CDN -->
+    <script src="https://unpkg.com"></script>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0; padding: 0;
             display: flex; flex-direction: column;
-            height: 100vh; width: 100vw;
-            background-color: #121212; color: #ffffff;
-            overflow: hidden;
+            height: 100vh; background-color: #121212; color: #ffffff;
         }
         header {
             background-color: #00878f; /* Arduino Teal */
             padding: 10px 20px;
             display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-            height: 60px; box-sizing: border-box;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3); z-index: 10;
         }
         h1 { margin: 0; font-size: 1.4rem; font-weight: 600; }
         .btn {
             background-color: #e47128; color: white; border: none;
-            padding: 10px 16px; font-size: 0.95rem; font-weight: bold;
-            border-radius: 6px; cursor: pointer; transition: 0.2s ease;
+            padding: 8px 16px; font-weight: bold; border-radius: 4px;
+            cursor: pointer; transition: 0.2s ease;
         }
         .btn:hover { background-color: #c55d1d; }
         
-        #workspace-container {
-            display: flex; flex: 1;
-            height: calc(100vh - 60px); width: 100vw;
-            overflow: hidden;
-        }
+        #workspace-container { display: flex; flex: 1; overflow: hidden; width: 100vw; }
         
-        #ai-chat-area {
-            width: 25vw; min-width: 280px; max-width: 350px;
-            background-color: #181818; display: flex; flex-direction: column;
-            border-right: 2px solid #2d2d2d;
-        }
+        /* Left: AI Assistant Chatbot */
+        #ai-chat-area { flex: 0.8; background-color: #181818; display: flex; flex-direction: column; border-right: 2px solid #2d2d2d; }
         
-        #block-builder-area {
-            flex: 2; height: 100%;
-            background-color: #1e1e1e;
-            display: flex; flex-direction: column;
-        }
-        .toolbox-bar {
-            background-color: #252526; padding: 10px;
-            display: flex; gap: 8px; flex-wrap: wrap;
-            border-bottom: 2px solid #2d2d2d;
-        }
-        .tool-btn {
-            color: white; border: none; padding: 8px 12px;
-            font-weight: bold; border-radius: 4px; cursor: pointer; font-size: 0.85rem;
-        }
-        .canvas-grid {
-            flex: 1; padding: 20px; overflow-y: auto;
-            display: flex; flex-direction: column; gap: 8px;
-            background-image: radial-gradient(#333 1px, transparent 1px);
-            background-size: 20px 20px;
-        }
-        .kid-block {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 12px 15px; border-radius: 8px; font-weight: bold;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2); animation: popIn 0.2s ease;
-        }
-        @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        .remove-block-btn {
-            background: none; border: none; color: white; 
-            font-weight: bold; cursor: pointer; font-size: 1.1rem;
-        }
+        /* Center: Real Blockly Workspace Grid */
+        #blockly-area { flex: 1.5; height: 100%; }
         
-        #code-area {
-            width: 25vw; min-width: 280px; max-width: 350px;
-            background-color: #1e1e1e; border-left: 2px solid #2d2d2d;
-            display: flex; flex-direction: column;
-        }
+        /* Right: Live C++ Generated Output Screen */
+        #code-area { flex: 0.7; background-color: #1e1e1e; border-left: 2px solid #2d2d2d; display: flex; flex-direction: column; }
+        
         .panel-header {
-            background-color: #252526; padding: 12px 15px;
-            font-weight: bold; font-size: 0.85rem; text-transform: uppercase;
+            background-color: #252526; padding: 12px 15px; font-weight: bold;
+            font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;
             border-bottom: 2px solid #2d2d2d; color: #cccccc;
         }
+        
         pre {
             margin: 0; padding: 15px; flex: 1; overflow: auto;
-            color: #a9dc76; font-family: 'Consolas', monospace;
+            color: #a9dc76; font-family: 'Consolas', 'Courier New', monospace;
             font-size: 0.9rem; white-space: pre-wrap; line-height: 1.4;
         }
         #chat-history { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
-        .msg { max-width: 85%; padding: 10px 14px; border-radius: 8px; font-size: 0.95rem; }
-        .msg.user { background-color: #00878f; align-self: flex-end; }
-        .msg.ai { background-color: #2d2d2d; align-self: flex-start; border-left: 3px solid #e47128; }
+        .msg { max-width: 85%; padding: 10px 14px; border-radius: 8px; font-size: 0.95rem; line-height: 1.4; }
+        .msg.user { background-color: #00878f; color: white; align-self: flex-end; }
+        .msg.ai { background-color: #2d2d2d; color: #e0e0e0; align-self: flex-start; border-left: 3px solid #e47128; }
         .chat-input-bar { display: flex; padding: 12px; background-color: #212121; border-top: 1px solid #2d2d2d; gap: 8px; }
         .chat-input-bar input { flex: 1; background-color: #121212; border: 1px solid #3c3c3c; color: white; padding: 12px; border-radius: 6px; }
     </style>
@@ -97,105 +60,131 @@
 <body>
 
     <header>
-        <h1>🚀 Giant Kids Sensor Studio! 🦄</h1>
-        <button class="btn" onclick="copyArduinoCode()">📋 Copy Magic Code</button>
+        <h1>🤖 Custom Arduino Block Studio Pro</h1>
+        <button class="btn" onclick="copyArduinoCode()">📋 Copy C++ Code</button>
     </header>
 
     <div id="workspace-container">
-        <!-- 1. LEFT PANEL: Chat Workspace -->
+        <!-- 1. LEFT PANEL: AI Chat Assistant -->
         <div id="ai-chat-area">
-            <div class="panel-header">✨ Step 1: Talk to your Robot Helper!</div>
+            <div class="panel-header">✨ Step 1: Circuit & Code Copilot</div>
             <div id="chat-history">
-                <div class="msg ai">Hi friend! 👋 Click the colorful shape buttons at the top of the middle grid to build your tricks! No internet blocking can stop us now!</div>
+                <div class="msg ai">Hey there! Welcome to your upgraded studio. Tell me what kind of advanced project you are engineering today, and I'll help you plan out the wiring and logic pins!</div>
             </div>
             <div class="chat-input-bar">
-                <input type="text" id="chat-input" placeholder="Ask your robot friend a question..." onkeypress="handleChatKey(event)">
-                <button class="btn" onclick="sendChatMessage()">Go!</button>
+                <input type="text" id="chat-input" placeholder="Ask your AI copilot anything..." onkeypress="handleChatKey(event)">
+                <button class="btn" onclick="sendChatMessage()">Send</button>
             </div>
         </div>
 
-        <!-- 2. MIDDLE PANEL: Pure Local HTML Block Builder Canvas -->
-        <div id="block-builder-area">
-            <div class="toolbox-bar">
-                <button class="tool-btn" style="background-color: #2ecc71;" onclick="addBlock('pir')">🏃 Motion Eye</button>
-                <button class="tool-btn" style="background-color: #1abc9c;" onclick="addBlock('distance')">📏 Distance Radar</button>
-                <button class="tool-btn" style="background-color: #3498db;" onclick="addBlock('light')">👁️ Light Eye</button>
-                <button class="tool-btn" style="background-color: #f1c40f; color: #121212;" onclick="addBlock('temp')">🌡️ Thermometer</button>
-                <button class="tool-btn" style="background-color: #1abc9c;" onclick="addBlock('water')">💧 Water Drop Sensor</button>
-                <button class="tool-btn" style="background-color: #7f8c8d;" onclick="addBlock('button')">🔘 Big Button</button>
-                <button class="tool-btn" style="background-color: #e74c3c;" onclick="addBlock('buzz')">🔊 Noise Maker ON</button>
-                <button class="tool-btn" style="background-color: #e67e22;" onclick="addBlock('led_on')">💡 Red Light ON</button>
-                <button class="tool-btn" style="background-color: #d35400;" onclick="addBlock('led_off')">💤 Red Light OFF</button>
-                <button class="tool-btn" style="background-color: #9b59b6;" onclick="addBlock('wait')">⏱️ Wait 3 Seconds</button>
-            </div>
-            <div class="canvas-grid" id="canvasGrid">
-                <!-- Clicked blocks will instantly render here dynamically -->
-            </div>
-        </div>
+        <!-- 2. MIDDLE PANEL: Drag & Drop Blockly Puzzle Grid -->
+        <div id="blockly-area"></div>
         
-        <!-- 3. RIGHT PANEL: Live Generated Code Preview -->
+        <!-- 3. RIGHT PANEL: Live C++ Generated Output Code -->
         <div id="code-area">
-            <div class="panel-header">📝 Step 2: Magic Code Output</div>
-            <pre id="code-output">// Click the top buttons to see your real code write itself!</pre>
+            <div class="panel-header">📝 Step 2: Compiled C++ Code (.ino)</div>
+            <pre id="code-output">// Drag blocks on the canvas to write code instantly...</pre>
         </div>
     </div>
 
+    <!-- Massive Advanced Toolbox Categories -->
+    <xml id="toolbox" style="display: none">
+        <category name="🔌 Inputs & Pins" colour="#00878f">
+            <block type="digital_read"></block>
+            <block type="analog_read"></block>
+        </category>
+        <category name="💡 Outputs & Actuators" colour="#e67e22">
+            <block type="digital_write"></block>
+            <block type="analog_write"></block>
+            <block type="servo_move"></block>
+        </category>
+        <category name="🌡️ Sensor Suites" colour="#2ecc71">
+            <block type="sensor_ultrasonic"></block>
+            <block type="sensor_dht"></block>
+            <block type="sensor_ldr"></block>
+        </category>
+        <category name="🧠 Control Logic" colour="#9b59b6">
+            <block type="delay_ms"></block>
+            <block type="controls_if"></block>
+            <block type="logic_compare"></block>
+            <block type="math_number"></block>
+        </category>
+    </xml>
+
     <script>
-        let activeBlocks = [];
+        // --- 1. DEFINING REAL ARDUINO BLOCKLY PUZZLE PIECES ---
+        Blockly.Blocks['digital_write'] = {
+            init: function() {
+                this.appendDummyInput().appendField("Digital Write Pin #").appendField(new Blockly.FieldNumber(13, 0, 13), "PIN").appendField("to").appendField(new Blockly.FieldDropdown([["HIGH","HIGH"], ["LOW","LOW"]]), "STATE");
+                this.setPreviousStatement(true, null); this.setNextStatement(true, null); this.setColour("#e67e22");
+            }
+        };
+        Blockly.Blocks['analog_write'] = {
+            init: function() {
+                this.appendDummyInput().appendField("PWM Analog Write Pin #").appendField(new Blockly.FieldNumber(3, 0, 13), "PIN").appendField("Value (0-255)").appendField(new Blockly.FieldNumber(128, 0, 255), "NUM");
+                this.setPreviousStatement(true, null); this.setNextStatement(true, null); this.setColour("#e67e22");
+            }
+        };
+        Blockly.Blocks['digital_read'] = {
+            init: function() {
+                this.appendDummyInput().appendField("Digital Read Pin #").appendField(new Blockly.FieldNumber(2, 0, 13), "PIN");
+                this.setOutput(true, "Boolean"); this.setColour("#00878f");
+            }
+        };
+        Blockly.Blocks['analog_read'] = {
+            init: function() {
+                this.appendDummyInput().appendField("Analog Read Pin A").appendField(new Blockly.FieldNumber(0, 0, 5), "PIN");
+                this.setOutput(true, "Number"); this.setColour("#00878f");
+            }
+        };
+        Blockly.Blocks['servo_move'] = {
+            init: function() {
+                this.appendDummyInput().appendField("Move Servo Pin #").appendField(new Blockly.FieldNumber(9, 0, 13), "PIN").appendField("to Angle (0-180)").appendField(new Blockly.FieldNumber(90, 0, 180), "ANGLE");
+                this.setPreviousStatement(true, null); this.setNextStatement(true, null); this.setColour("#e67e22");
+            }
+        };
+        Blockly.Blocks['sensor_ultrasonic'] = {
+            init: function() {
+                this.appendDummyInput().appendField("Ultrasonic Distance (CM) Trig #").appendField(new Blockly.FieldNumber(9, 0, 13), "TRIG").appendField("Echo #").appendField(new Blockly.FieldNumber(10, 0, 13), "ECHO");
+                this.setOutput(true, "Number"); this.setColour("#2ecc71");
+            }
+        };
+        Blockly.Blocks['sensor_dht'] = {
+            init: function() {
+                this.appendDummyInput().appendField("Read DHT Temperature Pin #").appendField(new Blockly.FieldNumber(4, 0, 13), "PIN");
+                this.setOutput(true, "Number"); this.setColour("#2ecc71");
+            }
+        };
+        Blockly.Blocks['sensor_ldr'] = {
+            init: function() {
+                this.appendDummyInput().appendField("Read LDR Light Level Pin A").appendField(new Blockly.FieldNumber(0, 0, 5), "PIN");
+                this.setOutput(true, "Number"); this.setColour("#2ecc71");
+            }
+        };
+        Blockly.Blocks['delay_ms'] = {
+            init: function() {
+                this.appendDummyInput().appendField("Delay / Wait").appendField(new Blockly.FieldNumber(1000, 0), "MS").appendField("ms");
+                this.setPreviousStatement(true, null); this.setNextStatement(true, null); this.setColour("#9b59b6");
+            }
+        };
 
-        function addBlock(type) {
-            activeBlocks.push(type);
-            renderBlocks();
-        }
-
-        function removeBlock(index) {
-            activeBlocks.splice(index, 1);
-            renderBlocks();
-        }
-
-        function renderBlocks() {
-            const grid = document.getElementById('canvasGrid');
-            grid.innerHTML = ''; 
-            
-            let arduinoLoopCode = '';
-
-            activeBlocks.forEach((block, index) => {
-                const blockDiv = document.createElement('div');
-                blockDiv.className = 'kid-block';
-                
-                let label = '';
-                if(block === 'pir') {
-                    blockDiv.style.backgroundColor = '#2ecc71';
-                    label = "🏃 IF Motion Sensor sees movement:";
-                    arduinoLoopCode += "  if (digitalRead(2) == HIGH) {\n";
-                } else if(block === 'distance') {
-                    blockDiv.style.backgroundColor = '#1abc9c';
-                    label = "📏 IF Radar Sensor tracks something close:";
-                    arduinoLoopCode += "  if (getDistance() < 15) {\n";
-                } else if(block === 'light') {
-                    blockDiv.style.backgroundColor = '#3498db';
-                    label = "👁️ IF Light Eye Sensor says it is Dark:";
-                    arduinoLoopCode += "  if (analogRead(A1) < 300) {\n";
-                } else if(block === 'temp') {
-                    blockDiv.style.backgroundColor = '#f1c40f'; blockDiv.style.color = '#121212';
-                    label = "🌡️ IF Thermometer feels Hot:";
-                    arduinoLoopCode += "  if (analogRead(A2) > 150) {\n";
-                } else if(block === 'water') {
-                    blockDiv.style.backgroundColor = '#1abc9c';
-                    label = "💧 IF Moisture Sensor touches water:";
-                    arduinoLoopCode += "  if (analogRead(A0) > 400) {\n";
-                } else if(block === 'button') {
-                    blockDiv.style.backgroundColor = '#7f8c8d';
-                    label = "🔘 IF Big Button is pressed:";
-                    arduinoLoopCode += "  if (digitalRead(4) == LOW) {\n";
-                } else if(block === 'buzz') {
-                    blockDiv.style.backgroundColor = '#e74c3c';
-                    label = "▶️ THEN DO: 🔊 Turn Noise Maker ON";
-                    arduinoLoopCode += "    digitalWrite(3, HIGH);\n";
-                } else if(block === 'led_on') {
-                    blockDiv.style.backgroundColor = '#e67e22';
-                    label = "▶️ THEN DO: 💡 Turn Red Light ON";
-                    arduinoLoopCode += "    digitalWrite(13, HIGH);\n";
-                } else if(block === 'led_off') {
-                    blockDiv.style.backgroundColor = '#d35400';
-                    label = "▶️ THEN DO: 💤 Turn Red Light OFF";
+        // --- 2. C++ STRING GENERATION CODE ENGINE ---
+        const arduinoGenerator = new Blockly.Generator('ARDUINO');
+        arduinoGenerator.scrub_ = function(block, code, thisOnly) {
+            const nextBlock = block.nextConnection && block.nextConnection.targetBlock();
+            return (nextBlock && !thisOnly) ? code + arduinoGenerator.blockToCode(nextBlock) : code;
+        };
+        
+        arduinoGenerator['digital_write'] = function(block) {
+            const pin = block.getFieldValue('PIN'); const state = block.getFieldValue('STATE');
+            arduinoGenerator.setupCode_[pin] = `  pinMode(${pin}, OUTPUT);`;
+            return `  digitalWrite(${pin}, ${state});\n`;
+        };
+        arduinoGenerator['analog_write'] = function(block) {
+            const pin = block.getFieldValue('PIN'); const num = block.getFieldValue('NUM');
+            arduinoGenerator.setupCode_[pin] = `  pinMode(${pin}, OUTPUT);`;
+            return `  analogWrite(${pin}, ${num});\n`;
+        };
+        arduinoGenerator['digital_read'] = function(block) {
+            const pin = block.getFieldValue('PIN');
+            arduinoGenerator.setupCode_[pin] = `  pinMode(${pin}, INPUT);`;
