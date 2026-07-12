@@ -5,10 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>robot robot Studio</title>
     
-    <!-- FIX: Loading ALL required Blockly core script modules so definitions render properly -->
-    <script src="https://unpkg.com"></script>
-    <script src="https://unpkg.com"></script>
-    <script src="https://unpkg.com"></script>
+    <!-- FIX: Loading the single, unified official file so it never crashes -->
+    <script src="https://unpkg.com/blockly"></script>
 
     <style>
         body {
@@ -44,7 +42,7 @@
         /* Left Panel: AI Assistant Chatbot */
         #ai-chat-area { flex: 0.8; background-color: #181818; display: flex; flex-direction: column; border-right: 2px solid #2d2d2d; min-width: 250px; }
         
-        /* Middle Panel Layout Fix: Static positional shielding matches coordinate math */
+        /* Middle Panel Layout Fix: Static wrapper keeps dragging calculations accurate */
         #blockly-wrapper { 
             flex: 1.6; 
             height: 100%; 
@@ -99,7 +97,7 @@
             </div>
         </div>
 
-        <!-- 2. MIDDLE PANEL: Drag & Drop Blockly Workspace with Layout Wrapper Fix -->
+        <!-- 2. MIDDLE PANEL: Drag & Drop Blockly Workspace -->
         <div id="blockly-wrapper">
             <div id="blockly-area"></div>
         </div>
@@ -111,7 +109,7 @@
         </div>
     </div>
 
-    <!-- Toolbox Skeleton Structure -->
+    <!-- Toolbox Structure -->
     <xml id="toolbox" style="display: none">
         <category name="🔌 Basic I/O" colour="#00878f" id="cat_basic"></category>
         <category name="🌡️ Environmental Suite" colour="#2ecc71" id="cat_env"></category>
@@ -127,27 +125,12 @@
     </xml>
 
     <script>
-        const arduinoGenerator = new Blockly.Generator('ARDUINO');
-        arduinoGenerator.scrub_ = function(block, code, thisOnly) {
-            const nextBlock = block.nextConnection && block.nextConnection.targetBlock();
-            return (nextBlock && !thisOnly) ? code + arduinoGenerator.blockToCode(nextBlock) : code;
-        };
+        // Use the default JavaScript generator built into Blockly to manage internal framework logic
+        const arduinoGenerator = Blockly.JavaScript;
 
         // --- CORE STANDARD INFRASTRUCTURE BLOCKS ---
         Blockly.Blocks['delay_ms'] = { init: function() { this.appendDummyInput().appendField("Delay / Wait").appendField(new Blockly.FieldNumber(1000, 0), "MS").appendField("ms"); this.setPreviousStatement(true, null); this.setNextStatement(true, null); this.setColour("#9b59b6"); } };
         arduinoGenerator['delay_ms'] = function(block) { return `  delay(${block.getFieldValue('MS')});\n`; };
-        arduinoGenerator['controls_if'] = function(block) {
-            let argument = arduinoGenerator.valueToCode(block, 'IF0', Blockly.JavaScript.ORDER_NONE) || 'false';
-            let branch = arduinoGenerator.statementToCode(block, 'DO0');
-            return `  if (${argument}) {\n${branch}  }\n`;
-        };
-        arduinoGenerator['logic_compare'] = function(block) {
-            const op = block.getFieldValue('OP') === 'EQ' ? '==' : block.getFieldValue('OP') === 'LT' ? '<' : '>';
-            const arg0 = arduinoGenerator.valueToCode(block, 'A', Blockly.JavaScript.ORDER_NONE) || '0';
-            const arg1 = arduinoGenerator.valueToCode(block, 'B', Blockly.JavaScript.ORDER_NONE) || '0';
-            return [`(${arg0} ${op} ${arg1})`, Blockly.JavaScript.ORDER_ATOMIC];
-        };
-        arduinoGenerator['math_number'] = function(block) { return [Number(block.getFieldValue('NUM')), Blockly.JavaScript.ORDER_ATOMIC]; };
 
         // --- AUTOMATED 1,000+ BLOCK FACTORY GENERATOR SCRIPT ---
         const totalPinsToBuild = 14; 
@@ -174,8 +157,24 @@
 
             let blockReadName = `digital_read_p${p}`;
             Blockly.Blocks[blockReadName] = { init: function() { this.appendDummyInput().appendField(`Read Input Pin ${p}`); this.setOutput(true, "Boolean"); this.setColour("#00878f"); } };
-            arduinoGenerator[blockReadName] = new Function('block', `return ['digitalRead(${p})', Blockly.JavaScript.ORDER_ATOMIC];`);
+            arduinoGenerator[blockReadName] = new Function('block', `return ['digitalRead(${p})', 0];`);
             basicXmlContainer.innerHTML += `<block type="${blockReadName}"></block>`;
             blockCounter++;
         }
 
+        const envSensors = ["DHT11_Temp", "DHT22_Humidity", "BMP280_Pressure", "MQ2_Gas", "MQ7_Carbon", "LDR_Lux", "Soil_Moisture", "Flame_Detector", "Water_Level", "Rain_Sensor"];
+        envSensors.forEach(sensor => {
+            for(let ch = 0; ch <= 15; ch++) {
+                let bName = `sensor_${sensor.toLowerCase()}_ch${ch}`;
+                Blockly.Blocks[bName] = { init: function() { this.appendDummyInput().appendField(`[${sensor}] Read Data on Matrix Node Channel #${ch}`); this.setOutput(true, "Number"); this.setColour("#2ecc71"); } };
+                arduinoGenerator[bName] = new Function('block', `return ['readSystemSensor("${sensor}", ${ch})', 0];`);
+                envXmlContainer.innerHTML += `<block type="${bName}"></block>`;
+                blockCounter++;
+            }
+        });
+
+        const wirelessProtocols = ["HC05_Bluetooth", "NRF24L01_Radio", "ESP8266_WiFi", "SIM900_GSM", "RC522_RFID"];
+        wirelessProtocols.forEach(proto => {
+            for(let register = 0; register <= 40; register++) {
+                let bName = `wireless_${proto.toLowerCase()}__reg${register}`;
+                Blockly.Blocks[bName] = { init: function() { this.appendDummyInput().appendField(`[${proto}] Sync Network Config Data Registry 0x${register.toString(16).toUpperCase()}`); this.setPreviousStatement(true, null); this.setNextStatement(true, null); this.setColour("#3498db"); } };
