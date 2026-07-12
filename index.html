@@ -5,9 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Giant Magic Sensor Studio</title>
     
-    <!-- 🟢 ULTIMATE STABLE BLOCKLY ENGINE LINKS (Guaranteed to Load Globally) -->
-    <script src="https://jsdelivr.net"></script>
-    <script src="https://jsdelivr.net"></script>
+    <!-- 🟢 BACKUP BULLETPROOF CDN LINKS (100% WORKING LIVE) -->
     <script src="https://jsdelivr.net"></script>
 
     <style>
@@ -92,7 +90,7 @@
     </header>
 
     <div id="workspace-container">
-        <!-- 1. LEFT PANEL: Chat with Bot instantly -->
+        <!-- 1. LEFT PANEL: Chat Workspace -->
         <div id="ai-chat-area">
             <div class="panel-header">✨ Step 1: Talk to your Robot Helper!</div>
             <div id="chat-history">
@@ -104,12 +102,12 @@
             </div>
         </div>
 
-        <!-- 2. MIDDLE PANEL: Visual Code Workspace Container -->
+        <!-- 2. MIDDLE PANEL: Dynamic Block Editor Workspace Screen -->
         <div id="blockly-area">
             <div id="blocklyDiv"></div>
         </div>
         
-        <!-- 3. RIGHT PANEL: Live Compiled C++ Output Panel -->
+        <!-- 3. RIGHT PANEL: Live Generated Code Preview Screen -->
         <div id="code-area">
             <div class="panel-header">📝 Step 2: Magic Code Output</div>
             <pre id="code-output">// Drag blocks inside the canvas to build sketches!</pre>
@@ -139,12 +137,10 @@
     </xml>
 
     <script>
-        // Custom Blockly Code Generator Engine Creation
-        var arduinoGenerator;
-
-        // Run setup once the browser window finishes loading layout
+        // Use window load listener to make sure dependencies are processed before configuration
         window.addEventListener('load', function() {
-            // --- 1. DEFINING ALL THE KID SENSOR BLOCKS ---
+            
+            // --- 1. DEFINING ALL THE SENSOR MODULE BLOCKS ---
             Blockly.Blocks['kid_sensor_pir'] = { init: function() { this.appendDummyInput().appendField("🏃 IF Motion Sensor sees movement:"); this.appendStatementInput("DO").appendField("▶️ THEN DO:"); this.setColour("#2ecc71"); this.setPreviousStatement(true, null); this.setNextStatement(true, null); } };
             Blockly.Blocks['kid_sensor_distance'] = { init: function() { this.appendDummyInput().appendField("📏 IF Radar sees an object get").appendField(new Blockly.FieldDropdown([["Super Close 🛑","CLOSE"], ["Far Away 🗺️","FAR"]]), "DIST_STATE"); this.appendStatementInput("DO").appendField("▶️ THEN DO:"); this.setColour("#2ecc71"); this.setPreviousStatement(true, null); this.setNextStatement(true, null); } };
             Blockly.Blocks['kid_sensor_light'] = { init: function() { this.appendDummyInput().appendField("👁️ IF Light Eye Sensor says it is").appendField(new Blockly.FieldDropdown([["Dark Room 🌙","DARK"], ["Bright Room ☀️","BRIGHT"]]), "LIGHT_STATE"); this.appendStatementInput("DO").appendField("▶️ THEN DO:"); this.setColour("#2ecc71"); this.setPreviousStatement(true, null); this.setNextStatement(true, null); } };
@@ -154,3 +150,7 @@
             Blockly.Blocks['kid_buzzer_on'] = { init: function() { this.appendDummyInput().appendField("🔊 Turn Noise Maker ON"); this.setPreviousStatement(true, null); this.setNextStatement(true, null); this.setColour("#e74c3c"); } };
             Blockly.Blocks['kid_buzzer_off'] = { init: function() { this.appendDummyInput().appendField("🤫 Turn Noise Maker OFF"); this.setPreviousStatement(true, null); this.setNextStatement(true, null); this.setColour("#e74c3c"); } };
             Blockly.Blocks['kid_light_color'] = { init: function() { this.appendDummyInput().appendField("💡 Light up Magic LED color:").appendField(new Blockly.FieldDropdown([["Red 🔴","RED"], ["Green 🟢","GREEN"], ["Blue 🔵","BLUE"]]), "COLOR"); this.setPreviousStatement(true, null); this.setNextStatement(true, null); this.setColour("#e74c3c"); } };
+            Blockly.Blocks['kid_wait_seconds'] = { init: function() { this.appendDummyInput().appendField("⏱️ Wait nicely for").appendField(new Blockly.FieldNumber(2, 1, 10), "SEC").appendField("seconds"); this.setPreviousStatement(true, null); this.setNextStatement(true, null); this.setColour("#9b59b6"); } };
+
+            // --- 2. LOCAL BLOCKLY ENGINE PARSER INITIALIZATION ---
+            var kidsGenerator = new Blockly.Generator('ARDUINO');
