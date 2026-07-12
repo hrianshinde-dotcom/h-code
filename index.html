@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Giant Magic Sensor Studio</title>
+    <!-- Load Google Blockly Core via CDN -->
+    <script src="https://unpkg.com"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background-color: #121212;
+            color: #ffffff;
+        }
+        header {
+            background-color: #00878f; /* Arduino Teal */
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            z-index: 10;
+        }
+        h1 { margin: 0; font-size: 1.4rem; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+        .btn {
+            background-color: #e47128;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+        .btn:hover { background-color: #c55d1d; }
+        
+        #workspace-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            width: 100vw;
+        }
+        
+        /* Left Panel: Instant AI Chat Assistant */
+        #ai-chat-area {
+            flex: 0.8;
+            background-color: #181818;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid #2d2d2d;
+        }
+        
+        /* Middle Panel: Visual Block Canvas Workspace Area */
+        #blockly-area {
+            flex: 1.8;
+            height: 100%;
+        }
+        
+        /* Right Panel: Hidden Magic Arduino Output Code */
+        #code-area {
+            flex: 0.7;
+            background-color: #1e1e1e;
+            border-left: 2px solid #2d2d2d;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .panel-header {
+            background-color: #252526;
+            padding: 12px 15px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #2d2d2d;
+            color: #cccccc;
+        }
+        
+        pre {
+            margin: 0;
+            padding: 15px;
+            flex: 1;
+            overflow: auto;
+            color: #a9dc76;
+            font-family: 'Consolas', 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            line-height: 1.4;
+        }
+
+        /* AI Chat Window Interface Styles */
+        #chat-history {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .msg {
+            max-width: 85%;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+        .msg.user {
+            background-color: #00878f;
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 1px;
+        }
+        .msg.ai {
+            background-color: #2d2d2d;
+            color: #e0e0e0;
+            align-self: flex-start;
+            border-bottom-left-radius: 1px;
+            border-left: 3px solid #e47128;
+        }
+        .chat-input-bar {
+            display: flex;
+            padding: 12px;
+            background-color: #212121;
+            border-top: 1px solid #2d2d2d;
+            gap: 8px;
+        }
+        .chat-input-bar input {
+            flex: 1;
+            background-color: #121212;
+            border: 1px solid #3c3c3c;
+            color: white;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 0.95rem;
+        }
+
+        .blocklyText {
+            font-size: 15px !important;
+            font-weight: bold !important;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🚀 Giant Kids Sensor Studio! 🦄</h1>
+        <button class="btn" onclick="copyArduinoCode()">📋 Copy Magic Code</button>
+    </header>
+
+    <div id="workspace-container">
+        <!-- 1. LEFT PANEL: Instant AI Chat Assistant -->
+        <div id="ai-chat-area">
+            <div class="panel-header">✨ Step 1: Talk to your Robot Helper!</div>
+            <div id="chat-history">
+                <div class="msg ai">Hi friend! 👋 Look at all your new sensor blocks in the middle! We have temperature sensors, light eyes, and distance radars now. Ask me anything to build awesome tricks!</div>
+            </div>
+            <div class="chat-input-bar">
+                <input type="text" id="chat-input" placeholder="Ask your robot friend a question..." onkeypress="handleChatKey(event)">
+                <button class="btn" onclick="sendChatMessage()">Go! 🚀</button>
+            </div>
+        </div>
+
+        <!-- 2. MIDDLE PANEL: Super Simplified Block Canvas with ALL SENSORS -->
+        <div id="blockly-area"></div>
+        
+        <!-- 3. RIGHT PANEL: Hidden Magic Arduino Output Code -->
+        <div id="code-area">
+            <div class="panel-header">📝 Step 2: Magic Code Output</div>
+            <pre id="code-output">// Watch your real engineering code build here live!</pre>
+        </div>
+    </div>
+
+    <!-- Kid-Friendly Toolbox with Categorized Sensors -->
+    <xml id="toolbox" style="display: none">
+        <category name="🏃 Eyes & Motion" colour="#2ecc71">
+            <block type="kid_sensor_pir"></block>
+            <block type="kid_sensor_distance"></block>
+            <block type="kid_sensor_light"></block>
+        </category>
+        <category name="🌡️ Weather & Touch" colour="#1abc9c">
+            <block type="kid_sensor_temp"></block>
+            <block type="kid_sensor_water"></block>
+            <block type="kid_sensor_button"></block>
+        </category>
+        <category name="🔊 Alarms & Fun" colour="#e74c3c">
+            <block type="kid_buzzer_on"></block>
+            <block type="kid_buzzer_off"></block>
+            <block type="kid_light_color"></block>
+        </category>
+        <category name="⏱️ Magic Rules" colour="#9b59b6">
+            <block type="kid_wait_seconds"></block>
+        </category>
+    </xml>
+
+    <script>
+        // --- 1. DEFINING ALL THE NEW KID SENSOR BLOCKS ---
+
+        // 1. PIR Motion Block
+        Blockly.Blocks['kid_sensor_pir'] = {
+            init: function() {
+                this.appendDummyInput().appendField("🏃 IF Motion Sensor sees someone move:");
+                this.appendStatementInput("DO").appendField("▶️ THEN DO:");
+                this.setColour("#2ecc71");
+                this.setPreviousStatement(true, null); this.setNextStatement(true, null);
+            }
+        };
+
+        // 2. Ultrasonic Distance Block
+        Blockly.Blocks['kid_sensor_distance'] = {
+            init: function() {
+                this.appendDummyInput().appendField("📏 IF Radar Sensor sees an object get")
+                                       .appendField(new Blockly.FieldDropdown([["Super Close 🛑","CLOSE"], ["Far Away 🗺️","FAR"]]), "DIST_STATE");
+                this.appendStatementInput("DO").appendField("▶️ THEN DO:");
+                this.setColour("#2ecc71");
+                this.setPreviousStatement(true, null); this.setNextStatement(true, null);
+            }
+        };
+
+        // 3. LDR Light Eye Block
+        Blockly.Blocks['kid_sensor_light'] = {
+            init: function() {
+                this.appendDummyInput().appendField("👁️ IF Light Eye Sensor says it is")
+                                       .appendField(new Blockly.FieldDropdown([["Dark Room 🌙","DARK"], ["Bright Room ☀️","BRIGHT"]]), "LIGHT_STATE");
+                this.appendStatementInput("DO").appendField("▶️ THEN DO:");
+                this.setColour("#2ecc71");
+                this.setPreviousStatement(true, null); this.setNextStatement(true, null);
+            }
+        };
+
+        // 4. Temperature Block
+        Blockly.Blocks['kid_sensor_temp'] = {
+            init: function() {
+                this.appendDummyInput().appendField("🌡️ IF Thermometer Sensor feels")
+                                       .appendField(new Blockly.FieldDropdown([["Hot 🔥","HOT"], ["Cold ❄️","COLD"]]), "TEMP_STATE");
+                this.appendStatementInput("DO").appendField("▶️ THEN DO:");
+                this.setColour("#1abc9c");
+                this.setPreviousStatement(true, null); this.setNextStatement(true, null);
+            }
+        };
+
+        // 5. Soil Moisture / Rain Water Block
+        Blockly.Blocks['kid_sensor_water'] = {
+            init: function() {
+                this.appendDummyInput().appendField("💧 IF Moisture Sensor touches water:");
+                this.appendStatementInput("DO").appendField("▶️ THEN DO:");
+                this.setColour("#1abc9c");
+                this.setPreviousStatement(true, null); this.setNextStatement(true, null);
+            }
+        };
+
+        // 6. Push Button / Crash Switch Block
+        Blockly.Blocks['kid_sensor_button'] = {
+            init: function() {
+                this.appendDummyInput().appendField("🔘 IF big button is pressed:");
+                this.appendStatementInput("DO").appendField("▶️ THEN DO:");
+                this.setColour("#1abc9c");
+                this.setPreviousStatement(true, null); this.setNextStatement(true, null);
+            }
+        };
+
+        // --- OUTPUT MODULE BLOCKS ---
+
+        Blockly.Blocks['kid_buzzer_on'] = {
+            init: function() {
+                this.appendDummyInput().appendField("🔊 Turn Noise Maker ON");
