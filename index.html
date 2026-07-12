@@ -4,8 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Giant Magic Sensor Studio</title>
-    <!-- Load Google Blockly Core via CDN -->
+    
+    <!-- 🟢 FIXED BLOCKS ENGINE LINKS (Guaranteed to Load) -->
     <script src="https://unpkg.com"></script>
+    <script src="https://unpkg.com"></script>
+    <script src="https://unpkg.com"></script>
+    <script src="https://unpkg.com"></script>
+
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -16,6 +21,7 @@
             height: 100vh;
             background-color: #121212;
             color: #ffffff;
+            overflow: hidden;
         }
         header {
             background-color: #00878f; /* Arduino Teal */
@@ -25,16 +31,18 @@
             align-items: center;
             box-shadow: 0 4px 6px rgba(0,0,0,0.3);
             z-index: 10;
+            height: 50px;
+            box-sizing: border-box;
         }
         h1 { margin: 0; font-size: 1.4rem; font-weight: 600; display: flex; align-items: center; gap: 10px; }
         .btn {
             background-color: #e47128;
             color: white;
             border: none;
-            padding: 12px 20px;
-            font-size: 1rem;
+            padding: 8px 16px;
+            font-size: 0.95rem;
             font-weight: bold;
-            border-radius: 8px;
+            border-radius: 6px;
             cursor: pointer;
             transition: 0.2s ease;
         }
@@ -43,13 +51,15 @@
         #workspace-container {
             display: flex;
             flex: 1;
-            overflow: hidden;
+            height: calc(100vh - 50px);
             width: 100vw;
+            overflow: hidden;
         }
         
         /* Left Panel: Instant AI Chat Assistant */
         #ai-chat-area {
-            flex: 0.8;
+            width: 25vw;
+            min-width: 300px;
             background-color: #181818;
             display: flex;
             flex-direction: column;
@@ -58,13 +68,20 @@
         
         /* Middle Panel: Visual Block Canvas Workspace Area */
         #blockly-area {
-            flex: 1.8;
+            flex: 1;
             height: 100%;
+            position: relative;
+            background-color: #1e1e1e;
+        }
+        #blocklyDiv {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
         }
         
         /* Right Panel: Hidden Magic Arduino Output Code */
         #code-area {
-            flex: 0.7;
+            width: 25vw;
+            min-width: 300px;
             background-color: #1e1e1e;
             border-left: 2px solid #2d2d2d;
             display: flex;
@@ -159,7 +176,7 @@
         <div id="ai-chat-area">
             <div class="panel-header">✨ Step 1: Talk to your Robot Helper!</div>
             <div id="chat-history">
-                <div class="msg ai">Hi friend! 👋 Look at all your new sensor blocks in the middle! We have temperature sensors, light eyes, and distance radars now. Ask me anything to build awesome tricks!</div>
+                <div class="msg ai">Hi friend! 👋 Look at your sensor options in the middle panel! Ask me anything to build your security alarms or cool light tricks.</div>
             </div>
             <div class="chat-input-bar">
                 <input type="text" id="chat-input" placeholder="Ask your robot friend a question..." onkeypress="handleChatKey(event)">
@@ -167,17 +184,19 @@
             </div>
         </div>
 
-        <!-- 2. MIDDLE PANEL: Super Simplified Block Canvas with ALL SENSORS -->
-        <div id="blockly-area"></div>
+        <!-- 2. MIDDLE PANEL: Visual Code Workspace Container -->
+        <div id="blockly-area">
+            <div id="blocklyDiv"></div>
+        </div>
         
-        <!-- 3. RIGHT PANEL: Hidden Magic Arduino Output Code -->
+        <!-- 3. RIGHT PANEL: Live Compiled C++ Output Panel -->
         <div id="code-area">
             <div class="panel-header">📝 Step 2: Magic Code Output</div>
-            <pre id="code-output">// Watch your real engineering code build here live!</pre>
+            <pre id="code-output">// Drag blocks inside the canvas to build sketches!</pre>
         </div>
     </div>
 
-    <!-- Kid-Friendly Toolbox with Categorized Sensors -->
+    <!-- Kid-Friendly Toolbox Structure -->
     <xml id="toolbox" style="display: none">
         <category name="🏃 Eyes & Motion" colour="#2ecc71">
             <block type="kid_sensor_pir"></block>
@@ -200,73 +219,12 @@
     </xml>
 
     <script>
-        // --- 1. DEFINING ALL THE NEW KID SENSOR BLOCKS ---
-
-        // 1. PIR Motion Block
-        Blockly.Blocks['kid_sensor_pir'] = {
-            init: function() {
-                this.appendDummyInput().appendField("🏃 IF Motion Sensor sees someone move:");
-                this.appendStatementInput("DO").appendField("▶️ THEN DO:");
-                this.setColour("#2ecc71");
-                this.setPreviousStatement(true, null); this.setNextStatement(true, null);
-            }
-        };
-
-        // 2. Ultrasonic Distance Block
-        Blockly.Blocks['kid_sensor_distance'] = {
-            init: function() {
-                this.appendDummyInput().appendField("📏 IF Radar Sensor sees an object get")
-                                       .appendField(new Blockly.FieldDropdown([["Super Close 🛑","CLOSE"], ["Far Away 🗺️","FAR"]]), "DIST_STATE");
-                this.appendStatementInput("DO").appendField("▶️ THEN DO:");
-                this.setColour("#2ecc71");
-                this.setPreviousStatement(true, null); this.setNextStatement(true, null);
-            }
-        };
-
-        // 3. LDR Light Eye Block
-        Blockly.Blocks['kid_sensor_light'] = {
-            init: function() {
-                this.appendDummyInput().appendField("👁️ IF Light Eye Sensor says it is")
-                                       .appendField(new Blockly.FieldDropdown([["Dark Room 🌙","DARK"], ["Bright Room ☀️","BRIGHT"]]), "LIGHT_STATE");
-                this.appendStatementInput("DO").appendField("▶️ THEN DO:");
-                this.setColour("#2ecc71");
-                this.setPreviousStatement(true, null); this.setNextStatement(true, null);
-            }
-        };
-
-        // 4. Temperature Block
-        Blockly.Blocks['kid_sensor_temp'] = {
-            init: function() {
-                this.appendDummyInput().appendField("🌡️ IF Thermometer Sensor feels")
-                                       .appendField(new Blockly.FieldDropdown([["Hot 🔥","HOT"], ["Cold ❄️","COLD"]]), "TEMP_STATE");
-                this.appendStatementInput("DO").appendField("▶️ THEN DO:");
-                this.setColour("#1abc9c");
-                this.setPreviousStatement(true, null); this.setNextStatement(true, null);
-            }
-        };
-
-        // 5. Soil Moisture / Rain Water Block
-        Blockly.Blocks['kid_sensor_water'] = {
-            init: function() {
-                this.appendDummyInput().appendField("💧 IF Moisture Sensor touches water:");
-                this.appendStatementInput("DO").appendField("▶️ THEN DO:");
-                this.setColour("#1abc9c");
-                this.setPreviousStatement(true, null); this.setNextStatement(true, null);
-            }
-        };
-
-        // 6. Push Button / Crash Switch Block
-        Blockly.Blocks['kid_sensor_button'] = {
-            init: function() {
-                this.appendDummyInput().appendField("🔘 IF big button is pressed:");
-                this.appendStatementInput("DO").appendField("▶️ THEN DO:");
-                this.setColour("#1abc9c");
-                this.setPreviousStatement(true, null); this.setNextStatement(true, null);
-            }
-        };
-
-        // --- OUTPUT MODULE BLOCKS ---
-
-        Blockly.Blocks['kid_buzzer_on'] = {
-            init: function() {
-                this.appendDummyInput().appendField("🔊 Turn Noise Maker ON");
+        // --- 1. DEFINING ALL THE KID SENSOR BLOCKS ---
+        Blockly.Blocks['kid_sensor_pir'] = { init: function() { this.appendDummyInput().appendField("🏃 IF Motion Sensor sees movement:"); this.appendStatementInput("DO").appendField("▶️ THEN DO:"); this.setColour("#2ecc71"); this.setPreviousStatement(true, null); this.setNextStatement(true, null); } };
+        Blockly.Blocks['kid_sensor_distance'] = { init: function() { this.appendDummyInput().appendField("📏 IF Radar sees an object get").appendField(new Blockly.FieldDropdown([["Super Close 🛑","CLOSE"], ["Far Away 🗺️","FAR"]]), "DIST_STATE"); this.appendStatementInput("DO").appendField("▶️ THEN DO:"); this.setColour("#2ecc71"); this.setPreviousStatement(true, null); this.setNextStatement(true, null); } };
+        Blockly.Blocks['kid_sensor_light'] = { init: function() { this.appendDummyInput().appendField("👁️ IF Light Eye Sensor says it is").appendField(new Blockly.FieldDropdown([["Dark Room 🌙","DARK"], ["Bright Room ☀️","BRIGHT"]]), "LIGHT_STATE"); this.appendStatementInput("DO").appendField("▶️ THEN DO:"); this.setColour("#2ecc71"); this.setPreviousStatement(true, null); this.setNextStatement(true, null); } };
+        Blockly.Blocks['kid_sensor_temp'] = { init: function() { this.appendDummyInput().appendField("🌡️ IF Thermometer feels").appendField(new Blockly.FieldDropdown([["Hot 🔥","HOT"], ["Cold ❄️","COLD"]]), "TEMP_STATE"); this.appendStatementInput("DO").appendField("▶️ THEN DO:"); this.setColour("#1abc9c"); this.setPreviousStatement(true, null); this.setNextStatement(true, null); } };
+        Blockly.Blocks['kid_sensor_water'] = { init: function() { this.appendDummyInput().appendField("💧 IF Moisture Sensor touches water:"); this.appendStatementInput("DO").appendField("▶️ THEN DO:"); this.setColour("#1abc9c"); this.setPreviousStatement(true, null); this.setNextStatement(true, null); } };
+        Blockly.Blocks['kid_sensor_button'] = { init: function() { this.appendDummyInput().appendField("🔘 IF big button is pressed:"); this.appendStatementInput("DO").appendField("▶️ THEN DO:"); this.setColour("#1abc9c"); this.setPreviousStatement(true, null); this.setNextStatement(true, null); } };
+        Blockly.Blocks['kid_buzzer_on'] = { init: function() { this.appendDummyInput().appendField("🔊 Turn Noise Maker ON"); this.setPreviousStatement(true, null); this.setNextStatement(true, null); this.setColour("#e74c3c"); } };
+        Blockly.Blocks['kid_buzzer_off'] = { init: function() { this.appendDummyInput().appendField("🤫 Turn Noise Maker OFF"); this.setPreviousStatement(true, null); this.setNextStatement(true, null); this.setColour("#e74c3c"); } };
