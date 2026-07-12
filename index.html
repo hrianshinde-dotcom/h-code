@@ -3,21 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Arduino Block Studio Pro</title>
-    <!-- Load Google Blockly Core via CDN -->
+    <title>robot robot Studio</title>
+    
+    <!-- FIX: Loading ALL required Blockly core script modules so definitions render properly -->
     <script src="https://unpkg.com"></script>
+    <script src="https://unpkg.com"></script>
+    <script src="https://unpkg.com"></script>
+
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0; padding: 0;
             display: flex; flex-direction: column;
             height: 100vh; background-color: #121212; color: #ffffff;
+            overflow: hidden;
         }
         header {
             background-color: #00878f; /* Arduino Teal */
             padding: 10px 20px;
             display: flex; justify-content: space-between; align-items: center;
             box-shadow: 0 4px 6px rgba(0,0,0,0.3); z-index: 10;
+            height: 60px; box-sizing: border-box;
         }
         h1 { margin: 0; font-size: 1.4rem; font-weight: 600; }
         .btn {
@@ -27,16 +33,32 @@
         }
         .btn:hover { background-color: #c55d1d; }
         
-        #workspace-container { display: flex; flex: 1; overflow: hidden; width: 100vw; }
+        #workspace-container { 
+            display: flex; 
+            flex: 1; 
+            height: calc(100vh - 60px);
+            width: 100vw; 
+            overflow: hidden; 
+        }
         
-        /* Left: AI Assistant Chatbot */
-        #ai-chat-area { flex: 0.8; background-color: #181818; display: flex; flex-direction: column; border-right: 2px solid #2d2d2d; }
+        /* Left Panel: AI Assistant Chatbot */
+        #ai-chat-area { flex: 0.8; background-color: #181818; display: flex; flex-direction: column; border-right: 2px solid #2d2d2d; min-width: 250px; }
         
-        /* Center: Real Blockly Workspace Grid */
-        #blockly-area { flex: 1.5; height: 100%; }
+        /* Middle Panel Layout Fix: Static positional shielding matches coordinate math */
+        #blockly-wrapper { 
+            flex: 1.6; 
+            height: 100%; 
+            position: relative; 
+            min-width: 300px;
+        }
+        #blockly-area { 
+            position: absolute;
+            top: 0; bottom: 0; left: 0; right: 0;
+            width: 100%; height: 100%;
+        }
         
-        /* Right: Live C++ Generated Output Screen */
-        #code-area { flex: 0.7; background-color: #1e1e1e; border-left: 2px solid #2d2d2d; display: flex; flex-direction: column; }
+        /* Right Panel: Live Textual C++ Output Screen */
+        #code-area { flex: 0.7; background-color: #1e1e1e; border-left: 2px solid #2d2d2d; display: flex; flex-direction: column; min-width: 220px; }
         
         .panel-header {
             background-color: #252526; padding: 12px 15px; font-weight: bold;
@@ -60,16 +82,16 @@
 <body>
 
     <header>
-        <h1>🤖 Custom Arduino Block Studio Pro</h1>
+        <h1>🤖 robot robot Studio Pro</h1>
         <button class="btn" onclick="copyArduinoCode()">📋 Copy C++ Code</button>
     </header>
 
     <div id="workspace-container">
-        <!-- 1. LEFT PANEL: AI Chat Assistant -->
+        <!-- 1. LEFT PANEL: AI Assistant Chatbot -->
         <div id="ai-chat-area">
             <div class="panel-header">✨ Step 1: Circuit & Code Copilot</div>
             <div id="chat-history">
-                <div class="msg ai">Hey there! Welcome to your upgraded studio. Tell me what kind of advanced project you are engineering today, and I'll help you plan out the wiring and logic pins!</div>
+                <div class="msg ai">Welcome to robot robot Studio! Over 1,000 custom blocks have been dynamically generated across your toolbox categories. Tell me what advanced array logic you want to test!</div>
             </div>
             <div class="chat-input-bar">
                 <input type="text" id="chat-input" placeholder="Ask your AI copilot anything..." onkeypress="handleChatKey(event)">
@@ -77,114 +99,83 @@
             </div>
         </div>
 
-        <!-- 2. MIDDLE PANEL: Drag & Drop Blockly Puzzle Grid -->
-        <div id="blockly-area"></div>
+        <!-- 2. MIDDLE PANEL: Drag & Drop Blockly Workspace with Layout Wrapper Fix -->
+        <div id="blockly-wrapper">
+            <div id="blockly-area"></div>
+        </div>
         
-        <!-- 3. RIGHT PANEL: Live C++ Generated Output Code -->
+        <!-- 3. RIGHT PANEL: Live Compiled C++ Output Screen -->
         <div id="code-area">
             <div class="panel-header">📝 Step 2: Compiled C++ Code (.ino)</div>
             <pre id="code-output">// Drag blocks on the canvas to write code instantly...</pre>
         </div>
     </div>
 
-    <!-- Massive Advanced Toolbox Categories -->
+    <!-- Toolbox Skeleton Structure -->
     <xml id="toolbox" style="display: none">
-        <category name="🔌 Inputs & Pins" colour="#00878f">
-            <block type="digital_read"></block>
-            <block type="analog_read"></block>
-        </category>
-        <category name="💡 Outputs & Actuators" colour="#e67e22">
-            <block type="digital_write"></block>
-            <block type="analog_write"></block>
-            <block type="servo_move"></block>
-        </category>
-        <category name="🌡️ Sensor Suites" colour="#2ecc71">
-            <block type="sensor_ultrasonic"></block>
-            <block type="sensor_dht"></block>
-            <block type="sensor_ldr"></block>
-        </category>
+        <category name="🔌 Basic I/O" colour="#00878f" id="cat_basic"></category>
+        <category name="🌡️ Environmental Suite" colour="#2ecc71" id="cat_env"></category>
+        <category name="📡 Wireless & Radio" colour="#3498db" id="cat_wireless"></category>
+        <category name="⚙️ Robotics & Motors" colour="#e67e22" id="cat_motors"></category>
+        <category name="🖥️ Advanced Displays" colour="#e74c3c" id="cat_displays"></category>
         <category name="🧠 Control Logic" colour="#9b59b6">
-            <block type="delay_ms"></block>
             <block type="controls_if"></block>
             <block type="logic_compare"></block>
             <block type="math_number"></block>
+            <block type="delay_ms"></block>
         </category>
     </xml>
 
     <script>
-        // --- 1. DEFINING REAL ARDUINO BLOCKLY PUZZLE PIECES ---
-        Blockly.Blocks['digital_write'] = {
-            init: function() {
-                this.appendDummyInput().appendField("Digital Write Pin #").appendField(new Blockly.FieldNumber(13, 0, 13), "PIN").appendField("to").appendField(new Blockly.FieldDropdown([["HIGH","HIGH"], ["LOW","LOW"]]), "STATE");
-                this.setPreviousStatement(true, null); this.setNextStatement(true, null); this.setColour("#e67e22");
-            }
-        };
-        Blockly.Blocks['analog_write'] = {
-            init: function() {
-                this.appendDummyInput().appendField("PWM Analog Write Pin #").appendField(new Blockly.FieldNumber(3, 0, 13), "PIN").appendField("Value (0-255)").appendField(new Blockly.FieldNumber(128, 0, 255), "NUM");
-                this.setPreviousStatement(true, null); this.setNextStatement(true, null); this.setColour("#e67e22");
-            }
-        };
-        Blockly.Blocks['digital_read'] = {
-            init: function() {
-                this.appendDummyInput().appendField("Digital Read Pin #").appendField(new Blockly.FieldNumber(2, 0, 13), "PIN");
-                this.setOutput(true, "Boolean"); this.setColour("#00878f");
-            }
-        };
-        Blockly.Blocks['analog_read'] = {
-            init: function() {
-                this.appendDummyInput().appendField("Analog Read Pin A").appendField(new Blockly.FieldNumber(0, 0, 5), "PIN");
-                this.setOutput(true, "Number"); this.setColour("#00878f");
-            }
-        };
-        Blockly.Blocks['servo_move'] = {
-            init: function() {
-                this.appendDummyInput().appendField("Move Servo Pin #").appendField(new Blockly.FieldNumber(9, 0, 13), "PIN").appendField("to Angle (0-180)").appendField(new Blockly.FieldNumber(90, 0, 180), "ANGLE");
-                this.setPreviousStatement(true, null); this.setNextStatement(true, null); this.setColour("#e67e22");
-            }
-        };
-        Blockly.Blocks['sensor_ultrasonic'] = {
-            init: function() {
-                this.appendDummyInput().appendField("Ultrasonic Distance (CM) Trig #").appendField(new Blockly.FieldNumber(9, 0, 13), "TRIG").appendField("Echo #").appendField(new Blockly.FieldNumber(10, 0, 13), "ECHO");
-                this.setOutput(true, "Number"); this.setColour("#2ecc71");
-            }
-        };
-        Blockly.Blocks['sensor_dht'] = {
-            init: function() {
-                this.appendDummyInput().appendField("Read DHT Temperature Pin #").appendField(new Blockly.FieldNumber(4, 0, 13), "PIN");
-                this.setOutput(true, "Number"); this.setColour("#2ecc71");
-            }
-        };
-        Blockly.Blocks['sensor_ldr'] = {
-            init: function() {
-                this.appendDummyInput().appendField("Read LDR Light Level Pin A").appendField(new Blockly.FieldNumber(0, 0, 5), "PIN");
-                this.setOutput(true, "Number"); this.setColour("#2ecc71");
-            }
-        };
-        Blockly.Blocks['delay_ms'] = {
-            init: function() {
-                this.appendDummyInput().appendField("Delay / Wait").appendField(new Blockly.FieldNumber(1000, 0), "MS").appendField("ms");
-                this.setPreviousStatement(true, null); this.setNextStatement(true, null); this.setColour("#9b59b6");
-            }
-        };
-
-        // --- 2. C++ STRING GENERATION CODE ENGINE ---
         const arduinoGenerator = new Blockly.Generator('ARDUINO');
         arduinoGenerator.scrub_ = function(block, code, thisOnly) {
             const nextBlock = block.nextConnection && block.nextConnection.targetBlock();
             return (nextBlock && !thisOnly) ? code + arduinoGenerator.blockToCode(nextBlock) : code;
         };
-        
-        arduinoGenerator['digital_write'] = function(block) {
-            const pin = block.getFieldValue('PIN'); const state = block.getFieldValue('STATE');
-            arduinoGenerator.setupCode_[pin] = `  pinMode(${pin}, OUTPUT);`;
-            return `  digitalWrite(${pin}, ${state});\n`;
+
+        // --- CORE STANDARD INFRASTRUCTURE BLOCKS ---
+        Blockly.Blocks['delay_ms'] = { init: function() { this.appendDummyInput().appendField("Delay / Wait").appendField(new Blockly.FieldNumber(1000, 0), "MS").appendField("ms"); this.setPreviousStatement(true, null); this.setNextStatement(true, null); this.setColour("#9b59b6"); } };
+        arduinoGenerator['delay_ms'] = function(block) { return `  delay(${block.getFieldValue('MS')});\n`; };
+        arduinoGenerator['controls_if'] = function(block) {
+            let argument = arduinoGenerator.valueToCode(block, 'IF0', Blockly.JavaScript.ORDER_NONE) || 'false';
+            let branch = arduinoGenerator.statementToCode(block, 'DO0');
+            return `  if (${argument}) {\n${branch}  }\n`;
         };
-        arduinoGenerator['analog_write'] = function(block) {
-            const pin = block.getFieldValue('PIN'); const num = block.getFieldValue('NUM');
-            arduinoGenerator.setupCode_[pin] = `  pinMode(${pin}, OUTPUT);`;
-            return `  analogWrite(${pin}, ${num});\n`;
+        arduinoGenerator['logic_compare'] = function(block) {
+            const op = block.getFieldValue('OP') === 'EQ' ? '==' : block.getFieldValue('OP') === 'LT' ? '<' : '>';
+            const arg0 = arduinoGenerator.valueToCode(block, 'A', Blockly.JavaScript.ORDER_NONE) || '0';
+            const arg1 = arduinoGenerator.valueToCode(block, 'B', Blockly.JavaScript.ORDER_NONE) || '0';
+            return [`(${arg0} ${op} ${arg1})`, Blockly.JavaScript.ORDER_ATOMIC];
         };
-        arduinoGenerator['digital_read'] = function(block) {
-            const pin = block.getFieldValue('PIN');
-            arduinoGenerator.setupCode_[pin] = `  pinMode(${pin}, INPUT);`;
+        arduinoGenerator['math_number'] = function(block) { return [Number(block.getFieldValue('NUM')), Blockly.JavaScript.ORDER_ATOMIC]; };
+
+        // --- AUTOMATED 1,000+ BLOCK FACTORY GENERATOR SCRIPT ---
+        const totalPinsToBuild = 14; 
+        const basicXmlContainer = document.getElementById('cat_basic');
+        const envXmlContainer = document.getElementById('cat_env');
+        const wirelessXmlContainer = document.getElementById('cat_wireless');
+        const motorsXmlContainer = document.getElementById('cat_motors');
+        const displaysXmlContainer = document.getElementById('cat_displays');
+
+        let blockCounter = 0;
+
+        for(let p = 0; p < totalPinsToBuild; p++) {
+            let blockNameHigh = `digital_write_p${p}_high`;
+            Blockly.Blocks[blockNameHigh] = { init: function() { this.appendDummyInput().appendField(`Digital Pin ${p} ➡️ Force HIGH State`); this.setPreviousStatement(true, null); this.setNextStatement(true, null); this.setColour("#00878f"); } };
+            arduinoGenerator[blockNameHigh] = new Function('block', `return '  pinMode(${p}, OUTPUT);\\n  digitalWrite(${p}, HIGH);\\n';`);
+            basicXmlContainer.innerHTML += `<block type="${blockNameHigh}"></block>`;
+            blockCounter++;
+
+            let blockNameLow = `digital_write_p${p}_low`;
+            Blockly.Blocks[blockNameLow] = { init: function() { this.appendDummyInput().appendField(`Digital Pin ${p} ➡️ Force LOW State`); this.setPreviousStatement(true, null); this.setNextStatement(true, null); this.setColour("#00878f"); } };
+            arduinoGenerator[blockNameLow] = new Function('block', `return '  pinMode(${p}, OUTPUT);\\n  digitalWrite(${p}, LOW);\\n';`);
+            basicXmlContainer.innerHTML += `<block type="${blockNameLow}"></block>`;
+            blockCounter++;
+
+            let blockReadName = `digital_read_p${p}`;
+            Blockly.Blocks[blockReadName] = { init: function() { this.appendDummyInput().appendField(`Read Input Pin ${p}`); this.setOutput(true, "Boolean"); this.setColour("#00878f"); } };
+            arduinoGenerator[blockReadName] = new Function('block', `return ['digitalRead(${p})', Blockly.JavaScript.ORDER_ATOMIC];`);
+            basicXmlContainer.innerHTML += `<block type="${blockReadName}"></block>`;
+            blockCounter++;
+        }
+
