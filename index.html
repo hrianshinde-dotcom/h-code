@@ -3,93 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>robot robot Studio</title>
-    <!-- Core stable Blockly package link -->
-    <script src="https://unpkg.com"></script>
+    <title>robot robot Studio Pro</title>
     <style>
-        body { font-family: sans-serif; margin: 0; padding: 0; background-color: #121212; color: #fff; overflow: hidden; display: flex; flex-direction: column; height: 100vh; }
-        header { background-color: #00878f; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; height: 50px; box-sizing: border-box; }
-        h1 { margin: 0; font-size: 1.2rem; }
-        #container { display: flex; flex: 1; height: calc(100vh - 50px); }
-        #chat { flex: 0.5; background-color: #181818; display: flex; flex-direction: column; padding: 15px; border-right: 1px solid #333; overflow-y: auto; }
-        #blockly-wrapper { flex: 1.7; position: relative; height: 100%; }
-        #blockly-area { position: absolute; top:0; bottom:0; left:0; right:0; width:100%; height:100%; }
-        #code { flex: 0.6; background-color: #1e1e1e; padding: 15px; border-left: 1px solid #333; font-family: monospace; overflow: auto; white-space: pre-wrap; color: #a9dc76; margin: 0; }
-        .msg { background: #2d2d2d; padding: 10px; border-radius: 6px; font-size: 0.85rem; margin-bottom: 8px; border-left: 3px solid #e47128; }
-        .btn { background: #e47128; color: #fff; border: none; padding: 8px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            margin: 0; padding: 0;
+            display: flex; flex-direction: column;
+            height: 100vh; background-color: #121212; color: #ffffff;
+            overflow: hidden;
+        }
+        header {
+            background-color: #00878f; /* Arduino Teal */
+            padding: 10px 20px; display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3); height: 60px; box-sizing: border-box;
+        }
+        h1 { margin: 0; font-size: 1.3rem; font-weight: 600; }
+        .btn {
+            background-color: #e47128; color: white; border: none;
+            padding: 10px 16px; font-weight: bold; border-radius: 6px;
+            cursor: pointer; transition: 0.2s ease;
+        }
+        .btn:hover { background-color: #c55d1d; }
+        
+        #workspace-container { display: flex; flex: 1; height: calc(100vh - 60px); width: 100vw; overflow: hidden; }
+        
+        /* Left Panel: Local Copilot Chat */
+        #ai-chat-area { width: 25vw; min-width: 260px; background-color: #181818; display: flex; flex-direction: column; border-right: 2px solid #2d2d2d; }
+        
+        /* Center Panel: Uncrashable Visual Block Studio */
+        #block-builder-area { flex: 2; height: 100%; background-color: #1e1e1e; display: flex; flex-direction: column; }
+        .category-bar { background-color: #252526; padding: 10px; display: flex; gap: 8px; border-bottom: 2px solid #2d2d2d; overflow-x: auto; }
+        .cat-tab { background-color: #333; color: #ccc; border: none; padding: 8px 14px; font-weight: bold; border-radius: 6px; cursor: pointer; white-space: nowrap; }
+        .cat-tab.active { background-color: #e74c3c; color: white; }
+        
+        .block-menu-list { background-color: #161618; padding: 10px; display: flex; gap: 8px; overflow-x: auto; border-bottom: 1px solid #2d2d2d; min-height: 45px; }
+        .menu-block-item { color: white; border: none; padding: 10px 14px; font-weight: bold; border-radius: 6px; cursor: pointer; font-size: 0.85rem; white-space: nowrap; }
+        
+        .canvas-grid { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background-image: radial-gradient(#333 1px, transparent 1px); background-size: 20px 20px; }
+        .kid-block { display: flex; align-items: center; justify-content: space-between; padding: 12px 15px; border-radius: 8px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
+        .remove-block-btn { background: none; border: none; color: white; font-weight: bold; cursor: pointer; font-size: 1.1rem; }
+        
+        /* Right Panel: Live Code Terminal */
+        #code-area { width: 25vw; min-width: 260px; background-color: #1a1a1a; border-left: 2px solid #2d2d2d; display: flex; flex-direction: column; }
+        .panel-header { background-color: #252526; padding: 12px 15px; font-weight: bold; font-size: 0.85rem; text-transform: uppercase; border-bottom: 2px solid #2d2d2d; color: #cccccc; }
+        pre { margin: 0; padding: 15px; flex: 1; overflow: auto; color: #a9dc76; font-family: 'Consolas', monospace; font-size: 0.9rem; white-space: pre-wrap; line-height: 1.4; }
+        
+        #chat-history { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+        .msg { max-width: 85%; padding: 10px 14px; border-radius: 8px; font-size: 0.9rem; }
+        .msg.user { background-color: #00878f; align-self: flex-end; }
+        .msg.ai { background-color: #2d2d2d; align-self: flex-start; border-left: 3px solid #e47128; }
+        .chat-input-bar { display: flex; padding: 12px; background-color: #212121; border-top: 1px solid #2d2d2d; gap: 8px; }
+        .chat-input-bar input { flex: 1; background-color: #121212; border: 1px solid #3c3c3c; color: white; padding: 12px; border-radius: 6px; }
     </style>
 </head>
 <body>
+
     <header>
         <h1>🤖 robot robot Studio Pro</h1>
-        <button class="btn" onclick="navigator.clipboard.writeText(document.getElementById('code').innerText); alert('C++ Code Copied!');">📋 Copy Code</button>
+        <button class="btn" onclick="copyArduinoCode()">📋 Copy C++ Code</button>
     </header>
-    <div id="container">
-        <div id="chat">
-            <div class="msg">🎮 <b>All-Sensors Multi-Game Engine Activated!</b></div>
-            <div class="msg">Your Roblox, Minecraft, and Pokémon categories are fully active. Hook real buttons, buzzers, or motors up to game loops!</div>
+
+    <div id="workspace-container">
+        <!-- 1. LEFT PANEL: Uncrashable Copilot Chat -->
+        <div id="ai-chat-area">
+            <div class="panel-header">✨ Step 1: Code Copilot</div>
+            <div id="chat-history">
+                <div class="msg ai">Fixed! 🦾 The faulty internet files were completely skipped. This standalone studio has loaded natively. Click any category tab in the middle and hit a block button to write code loops!</div>
+            </div>
+            <div class="chat-input-bar">
+                <input type="text" id="chat-input" placeholder="Ask your AI copilot anything..." onkeypress="handleChatKey(event)">
+                <button class="btn" onclick="sendChatMessage()">Send</button>
+            </div>
         </div>
-        <div id="blockly-wrapper"><div id="blockly-area"></div></div>
-        <pre id="code">// Drag a gaming loop onto the canvas to watch code build...</pre>
+
+        <!-- 2. MIDDLE PANEL: Pure Local Code Block Canvas Grid -->
+        <div id="block-builder-area">
+            <div class="category-bar">
+                <button class="cat-tab active" id="tab-roblox" onclick="switchCategory('roblox', '#e74c3c')">🎮 Roblox</button>
+                <button class="cat-tab" id="tab-minecraft" onclick="switchCategory('minecraft', '#2ecc71')">⛏️ Minecraft</button>
+                <button class="cat-tab" id="tab-pokemon" onclick="switchCategory('pokemon', '#3498db')">🎒 Pokémon GO</button>
+                <button class="cat-tab" id="tab-basic" onclick="switchCategory('basic', '#00878f')">🔌 Pins I/O</button>
+                <button class="cat-tab" id="tab-motors" onclick="switchCategory('motors', '#e67e22')">⚙️ Robotics</button>
+            </div>
+            
+            <div class="block-menu-list" id="blockMenuTray"></div>
+            <div class="canvas-grid" id="canvasGrid"></div>
+        </div>
+        
+        <!-- 3. RIGHT PANEL: Live C++ Generated Code -->
+        <div id="code-area">
+            <div class="panel-header">📝 Step 2: Compiled Code (.ino)</div>
+            <pre id="code-output">void setup() {\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  // Click top selection buttons to build loops live!\n}</pre>
+        </div>
     </div>
 
-    <!-- Multi-Game Fast Sidebar Toolbox Category Setup -->
-    <xml id="toolbox" style="display: none">
-        <category name="🎮 Roblox Core" colour="#e74c3c">
-            <block type="roblox_event"></block>
-        </category>
-        <category name="⛏️ Minecraft Mod" colour="#2ecc71">
-            <block type="minecraft_event"></block>
-        </category>
-        <category name="🎒 Pokémon GO" colour="#3498db">
-            <block type="pokemon_event"></block>
-        </category>
-        <category name="🔌 Pin Outputs" colour="#00878f">
-            <block type="pin_high"></block>
-            <block type="pin_low"></block>
-        </category>
-        <category name="⚙️ Robotics Joint" colour="#e67e22">
-            <block type="move_motor"></block>
-        </category>
-        <category name="🧠 Control Logic" colour="#9b59b6">
-            <block type="delay_ms"></block>
-        </category>
-    </xml>
-
     <script>
-        // Define clean custom block architectures local to the workspace engine
-        Blockly.Blocks['roblox_event'] = { init: function() { this.appendDummyInput().appendField("🎮 Roblox Trigger:").appendField(new Blockly.FieldDropdown([["On Player Death 💀","DEATH"],["On Coin Collect 🪙","COIN"],["On Admin Mode Activated 👑","ADMIN"]]), "EV"); this.setPreviousStatement(true); this.setNextStatement(true); this.setColour("#e74c3c"); } };
-        Blockly.Blocks['minecraft_event'] = { init: function() { this.appendDummyInput().appendField("⛏️ Minecraft Trigger:").appendField(new Blockly.FieldDropdown([["On Creeper Exploded 💥","CREEPER"],["On Diamond Mined 💎","DIAMOND"],["On Player Damaged 💔","DAMAGE"]]), "EV"); this.setPreviousStatement(true); this.setNextStatement(true); this.setColour("#2ecc71"); } };
-        Blockly.Blocks['pokemon_event'] = { init: function() { this.appendDummyInput().appendField("🎒 Pokémon GO Trigger:").appendField(new Blockly.FieldDropdown([["On Pikachu Encountered ⚡","PIKA"],["On PokéStop Spun 🌀","STOP"],["On Gym Egg Hatched 🥚","EGG"]]), "EV"); this.setPreviousStatement(true); this.setNextStatement(true); this.setColour("#3498db"); } };
-        
-        Blockly.Blocks['pin_high'] = { init: function() { this.appendDummyInput().appendField("🔌 Turn ON Digital Pin #").appendField(new Blockly.FieldNumber(13, 0, 13), "PIN"); this.setPreviousStatement(true); this.setNextStatement(true); this.setColour("#00878f"); } };
-        Blockly.Blocks['pin_low'] = { init: function() { this.appendDummyInput().appendField("🔌 Turn OFF Digital Pin #").appendField(new Blockly.FieldNumber(13, 0, 13), "PIN"); this.setPreviousStatement(true); this.setNextStatement(true); this.setColour("#00878f"); } };
-        Blockly.Blocks['move_motor'] = { init: function() { this.appendDummyInput().appendField("⚙️ Steer Joint Pin #").appendField(new Blockly.FieldNumber(9, 0, 13), "PIN").appendField("to Angle").appendField(new Blockly.FieldNumber(90, 0, 180), "ANG"); this.setPreviousStatement(true); this.setNextStatement(true); this.setColour("#e67e22"); } };
-        Blockly.Blocks['delay_ms'] = { init: function() { this.appendDummyInput().appendField("⏱️ Wait Delay").appendField(new Blockly.FieldNumber(1000, 0), "MS").appendField("ms"); this.setPreviousStatement(true); this.setNextStatement(true); this.setColour("#9b59b6"); } };
+        let activeBlocks = [];
+        let currentCategory = 'roblox';
+        let currentThemeColor = '#e74c3c';
 
-        // JavaScript code emission configuration profiles
-        const generator = new Blockly.Generator('ARDUINO');
-        generator.scrub_ = function(b, c, t) { const n = b.nextConnection && b.nextConnection.targetBlock(); return n && !t ? c + generator.blockToCode(n) : c; };
-        
-        generator['roblox_event'] = function(b) { return `  if (checkRobloxEvent("${b.getFieldValue('EV')}")) {\n`; };
-        generator['minecraft_event'] = function(b) { return `  if (checkMinecraftEvent("${b.getFieldValue('EV')}")) {\n`; };
-        generator['pokemon_event'] = function(b) { return `  if (checkPokemonEvent("${b.getFieldValue('EV')}")) {\n`; };
-        
-        generator['pin_high'] = function(b) { return `    digitalWrite(${b.getFieldValue('PIN')}, HIGH);\n`; };
-        generator['pin_low'] = function(b) { return `    digitalWrite(${b.getFieldValue('PIN')}, LOW);\n`; };
-        generator['move_motor'] = function(b) { return `    myServo.write(${b.getFieldValue('ANG')});\n`; };
-        generator['delay_ms'] = function(b) { return `    delay(${b.getFieldValue('MS')});\n`; };
+        // Static Local Library Definitions—No cloud fetching required!
+        const blockLibrary = {
+            roblox: [
+                { id: "rb_death", text: "🎮 Roblox Loop: On Player Death 💀", code: "  if (checkRobloxEvent(\"DEATH\")) {\n" },
+                { id: "rb_coin", text: "🎮 Roblox Loop: On Coin Collect 🪙", code: "  if (checkRobloxEvent(\"COIN\")) {\n" },
+                { id: "rb_admin", text: "🎮 Roblox Loop: On Admin Activated 👑", code: "  if (checkRobloxEvent(\"ADMIN\")) {\n" }
+            ],
+            minecraft: [
+                { id: "mc_creeper", text: "⛏️ Minecraft Loop: On Creeper Exploded 💥", code: "  if (checkMinecraftEvent(\"CREEPER\")) {\n" },
+                { id: "mc_diamond", text: "⛏️ Minecraft Loop: On Diamond Mined 💎", code: "  if (checkMinecraftEvent(\"DIAMOND\")) {\n" },
+                { id: "mc_damage", text: "⛏️ Minecraft Loop: On Player Damaged 💔", code: "  if (checkMinecraftEvent(\"DAMAGE\")) {\n" }
+            ],
+            pokemon: [
+                { id: "pk_pika", text: "🎒 Pokémon GO Loop: On Pikachu Spotted ⚡", code: "  if (checkPokemonEvent(\"PIKA\")) {\n" },
+                { id: "pk_stop", text: "🎒 Pokémon GO Loop: On PokéStop Spun 🌀", code: "  if (checkPokemonEvent(\"STOP\")) {\n" }
+            ],
+            basic: [
+                { id: "io_p13_high", text: "▶️ THEN DO: 🔌 Turn ON Digital Pin 13 (LED)", code: "    digitalWrite(13, HIGH);\n" },
+                { id: "io_p13_low", text: "▶️ THEN DO: 🔌 Turn OFF Digital Pin 13 (LED)", code: "    digitalWrite(13, LOW);\n" },
+                { id: "io_p3_high", text: "▶️ THEN DO: 🔊 Turn ON Digital Pin 3 (Buzzer)", code: "    digitalWrite(3, HIGH);\n" },
+                { id: "io_p3_low", text: "▶️ THEN DO: 🔊 Turn OFF Digital Pin 3 (Buzzer)", code: "    digitalWrite(3, LOW);\n" },
+                { id: "io_delay_1s", text: "▶️ THEN DO: ⏱️ Wait/Delay for 1 Second", code: "    delay(1000);\n" }
+            ],
+            motors: [
+                { id: "mot_p9_90", text: "▶️ THEN DO: ⚙️ Steer Servo Pin 9 to 90°", code: "    myServo.write(90);\n" },
+                { id: "mot_p9_0", text: "▶️ THEN DO: ⚙️ Steer Servo Pin 9 to 0°", code: "    myServo.write(0);\n" }
+            ]
+        };
 
-        // Inject the workspace container layout properties
-        const ws = Blockly.inject('blockly-area', { toolbox: document.getElementById('toolbox'), grid: { spacing: 20, length: 3, colour: '#333', snap: true }, trashcan: true });
-        setTimeout(() => { Blockly.svgResize(ws); }, 50);
+        function switchCategory(catName, colorCode) {
+            currentCategory = catName; currentThemeColor = colorCode;
+            document.querySelectorAll('.cat-tab').forEach(btn => { btn.classList.remove('active'); btn.style.backgroundColor = '#333'; });
+            const activeTab = document.getElementById(`tab-${catName}`);
+            activeTab.classList.add('active'); activeTab.style.backgroundColor = colorCode;
 
-        ws.addChangeListener(() => {
-            const blockCode = generator.workspaceToCode(ws);
-            let closing = (blockCode.match(/\{/g) || []).length;
-            let braces = ''; for(let i=0; i<closing; i++) braces += "  }\n";
-            document.getElementById('code').innerText = `void setup() {\n  Serial.begin(9600);\n}\n\nvoid loop() {\n${blockCode}${braces}\n}`;
-        });
-    </script>
-</body>
-</html>
+            const tray = document.getElementById('blockMenuTray'); tray.innerHTML = '';
+            blockLibrary[catName].forEach(block => {
+                const item = document.createElement('button'); item.className = 'menu-block-item';
+                item.style.backgroundColor = colorCode; item.innerText = block.text;
+                item.onclick = () => { addBlockToCanvas(block) }; tray.appendChild(item);
+            });
+        }
+
+        function addBlockToCanvas(block) { activeBlocks.push({ ...block, theme: currentThemeColor }); renderCanvasAndCode(); }
+        function removeBlockFromCanvas(index) { activeBlocks.splice(index, 1); renderCanvasAndCode(); }
+
+        function renderCanvasAndCode() {
