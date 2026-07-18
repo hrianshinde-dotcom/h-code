@@ -4,176 +4,92 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>robot robot Studio</title>
-    
-    <!-- Using the single, standard official Blockly engine delivery link -->
+    <!-- Core stable Blockly package link -->
     <script src="https://unpkg.com"></script>
-
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0; padding: 0;
-            display: flex; flex-direction: column;
-            height: 100vh; background-color: #121212; color: #ffffff;
-            overflow: hidden;
-        }
-        header {
-            background-color: #00878f; /* Arduino Teal */
-            padding: 10px 20px;
-            display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3); z-index: 10;
-            height: 60px; box-sizing: border-box;
-        }
-        h1 { margin: 0; font-size: 1.4rem; font-weight: 600; }
-        .btn {
-            background-color: #e47128; color: white; border: none;
-            padding: 8px 16px; font-weight: bold; border-radius: 4px;
-            cursor: pointer; transition: 0.2s ease;
-        }
-        .btn:hover { background-color: #c55d1d; }
-        
-        #workspace-container { 
-            display: flex; 
-            flex: 1; 
-            height: calc(100vh - 60px);
-            width: 100vw; 
-            overflow: hidden; 
-        }
-        
-        /* Left Panel: AI Assistant Chatbot */
-        #ai-chat-area { flex: 0.8; background-color: #181818; display: flex; flex-direction: column; border-right: 2px solid #2d2d2d; min-width: 250px; }
-        
-        /* Middle Panel: Fixed Positional Wrapper to handle Drag-and-Drop math */
-        #blockly-wrapper { 
-            flex: 1.6; 
-            height: 100%; 
-            position: relative; 
-            min-width: 300px;
-        }
-        #blockly-area { 
-            position: absolute;
-            top: 0; bottom: 0; left: 0; right: 0;
-            width: 100%; height: 100%;
-        }
-        
-        /* Right Panel: Live Textual C++ Output Screen */
-        #code-area { flex: 0.7; background-color: #1e1e1e; border-left: 2px solid #2d2d2d; display: flex; flex-direction: column; min-width: 220px; }
-        
-        .panel-header {
-            background-color: #252526; padding: 12px 15px; font-weight: bold;
-            font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;
-            border-bottom: 2px solid #2d2d2d; color: #cccccc;
-        }
-        
-        pre {
-            margin: 0; padding: 15px; flex: 1; overflow: auto;
-            color: #a9dc76; font-family: 'Consolas', 'Courier New', monospace;
-            font-size: 0.9rem; white-space: pre-wrap; line-height: 1.4;
-        }
-        #chat-history { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
-        .msg { max-width: 85%; padding: 10px 14px; border-radius: 8px; font-size: 0.95rem; line-height: 1.4; }
-        .msg.user { background-color: #00878f; color: white; align-self: flex-end; }
-        .msg.ai { background-color: #2d2d2d; color: #e0e0e0; align-self: flex-start; border-left: 3px solid #e47128; }
-        .chat-input-bar { display: flex; padding: 12px; background-color: #212121; border-top: 1px solid #2d2d2d; gap: 8px; }
-        .chat-input-bar input { flex: 1; background-color: #121212; border: 1px solid #3c3c3c; color: white; padding: 12px; border-radius: 6px; }
+        body { font-family: sans-serif; margin: 0; padding: 0; background-color: #121212; color: #fff; overflow: hidden; display: flex; flex-direction: column; height: 100vh; }
+        header { background-color: #00878f; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; height: 50px; box-sizing: border-box; }
+        h1 { margin: 0; font-size: 1.2rem; }
+        #container { display: flex; flex: 1; height: calc(100vh - 50px); }
+        #chat { flex: 0.5; background-color: #181818; display: flex; flex-direction: column; padding: 15px; border-right: 1px solid #333; overflow-y: auto; }
+        #blockly-wrapper { flex: 1.7; position: relative; height: 100%; }
+        #blockly-area { position: absolute; top:0; bottom:0; left:0; right:0; width:100%; height:100%; }
+        #code { flex: 0.6; background-color: #1e1e1e; padding: 15px; border-left: 1px solid #333; font-family: monospace; overflow: auto; white-space: pre-wrap; color: #a9dc76; margin: 0; }
+        .msg { background: #2d2d2d; padding: 10px; border-radius: 6px; font-size: 0.85rem; margin-bottom: 8px; border-left: 3px solid #e47128; }
+        .btn { background: #e47128; color: #fff; border: none; padding: 8px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
-
     <header>
         <h1>🤖 robot robot Studio Pro</h1>
-        <button class="btn" onclick="copyArduinoCode()">📋 Copy C++ Code</button>
+        <button class="btn" onclick="navigator.clipboard.writeText(document.getElementById('code').innerText); alert('C++ Code Copied!');">📋 Copy Code</button>
     </header>
-
-    <div id="workspace-container">
-        <!-- 1. LEFT PANEL: AI Assistant Chatbot -->
-        <div id="ai-chat-area">
-            <div class="panel-header">✨ Step 1: Circuit & Code Copilot</div>
-            <div id="chat-history">
-                <div class="msg ai">Welcome to robot robot Studio! Over 1,000 custom blocks have been dynamically generated. Look at your new Roblox categories! Ask me any engineering or wiring questions.</div>
-            </div>
-            <div class="chat-input-bar">
-                <input type="text" id="chat-input" placeholder="Ask your AI copilot anything..." onkeypress="handleChatKey(event)">
-                <button class="btn" onclick="sendChatMessage()">Send</button>
-            </div>
+    <div id="container">
+        <div id="chat">
+            <div class="msg">🎮 <b>All-Sensors Multi-Game Engine Activated!</b></div>
+            <div class="msg">Your Roblox, Minecraft, and Pokémon categories are fully active. Hook real buttons, buzzers, or motors up to game loops!</div>
         </div>
-
-        <!-- 2. MIDDLE PANEL: Drag & Drop Blockly Workspace -->
-        <div id="blockly-wrapper">
-            <div id="blockly-area"></div>
-        </div>
-        
-        <!-- 3. RIGHT PANEL: Live Compiled C++ Output Screen -->
-        <div id="code-area">
-            <div class="panel-header">📝 Step 2: Compiled C++ Code (.ino)</div>
-            <pre id="code-output">// Drag blocks on the canvas to write code instantly...</pre>
-        </div>
+        <div id="blockly-wrapper"><div id="blockly-area"></div></div>
+        <pre id="code">// Drag a gaming loop onto the canvas to watch code build...</pre>
     </div>
 
-    <!-- Complete Toolbox Structure -->
+    <!-- Multi-Game Fast Sidebar Toolbox Category Setup -->
     <xml id="toolbox" style="display: none">
-        <category name="🎮 Roblox Integration" colour="#e74c3c" id="cat_roblox"></category>
-        <category name="🔌 Basic Hardware I/O" colour="#00878f" id="cat_basic"></category>
-        <category name="🌡️ Environmental Suite" colour="#2ecc71" id="cat_env"></category>
-        <category name="📡 Wireless Modules" colour="#3498db" id="cat_wireless"></category>
-        <category name="⚙️ Robotics Hub" colour="#e67e22" id="cat_motors"></category>
-        <category name="🧠 Logic Systems" colour="#9b59b6" id="cat_logic">
+        <category name="🎮 Roblox Core" colour="#e74c3c">
+            <block type="roblox_event"></block>
+        </category>
+        <category name="⛏️ Minecraft Mod" colour="#2ecc71">
+            <block type="minecraft_event"></block>
+        </category>
+        <category name="🎒 Pokémon GO" colour="#3498db">
+            <block type="pokemon_event"></block>
+        </category>
+        <category name="🔌 Pin Outputs" colour="#00878f">
+            <block type="pin_high"></block>
+            <block type="pin_low"></block>
+        </category>
+        <category name="⚙️ Robotics Joint" colour="#e67e22">
+            <block type="move_motor"></block>
+        </category>
+        <category name="🧠 Control Logic" colour="#9b59b6">
             <block type="delay_ms"></block>
         </category>
     </xml>
 
     <script>
-        // Use the native global JavaScript definition parser engine
-        const arduinoGenerator = Blockly.JavaScript;
+        // Define clean custom block architectures local to the workspace engine
+        Blockly.Blocks['roblox_event'] = { init: function() { this.appendDummyInput().appendField("🎮 Roblox Trigger:").appendField(new Blockly.FieldDropdown([["On Player Death 💀","DEATH"],["On Coin Collect 🪙","COIN"],["On Admin Mode Activated 👑","ADMIN"]]), "EV"); this.setPreviousStatement(true); this.setNextStatement(true); this.setColour("#e74c3c"); } };
+        Blockly.Blocks['minecraft_event'] = { init: function() { this.appendDummyInput().appendField("⛏️ Minecraft Trigger:").appendField(new Blockly.FieldDropdown([["On Creeper Exploded 💥","CREEPER"],["On Diamond Mined 💎","DIAMOND"],["On Player Damaged 💔","DAMAGE"]]), "EV"); this.setPreviousStatement(true); this.setNextStatement(true); this.setColour("#2ecc71"); } };
+        Blockly.Blocks['pokemon_event'] = { init: function() { this.appendDummyInput().appendField("🎒 Pokémon GO Trigger:").appendField(new Blockly.FieldDropdown([["On Pikachu Encountered ⚡","PIKA"],["On PokéStop Spun 🌀","STOP"],["On Gym Egg Hatched 🥚","EGG"]]), "EV"); this.setPreviousStatement(true); this.setNextStatement(true); this.setColour("#3498db"); } };
+        
+        Blockly.Blocks['pin_high'] = { init: function() { this.appendDummyInput().appendField("🔌 Turn ON Digital Pin #").appendField(new Blockly.FieldNumber(13, 0, 13), "PIN"); this.setPreviousStatement(true); this.setNextStatement(true); this.setColour("#00878f"); } };
+        Blockly.Blocks['pin_low'] = { init: function() { this.appendDummyInput().appendField("🔌 Turn OFF Digital Pin #").appendField(new Blockly.FieldNumber(13, 0, 13), "PIN"); this.setPreviousStatement(true); this.setNextStatement(true); this.setColour("#00878f"); } };
+        Blockly.Blocks['move_motor'] = { init: function() { this.appendDummyInput().appendField("⚙️ Steer Joint Pin #").appendField(new Blockly.FieldNumber(9, 0, 13), "PIN").appendField("to Angle").appendField(new Blockly.FieldNumber(90, 0, 180), "ANG"); this.setPreviousStatement(true); this.setNextStatement(true); this.setColour("#e67e22"); } };
+        Blockly.Blocks['delay_ms'] = { init: function() { this.appendDummyInput().appendField("⏱️ Wait Delay").appendField(new Blockly.FieldNumber(1000, 0), "MS").appendField("ms"); this.setPreviousStatement(true); this.setNextStatement(true); this.setColour("#9b59b6"); } };
 
-        // Base Delay infrastructure block definition
-        Blockly.Blocks['delay_ms'] = { init: function() { this.appendDummyInput().appendField("Delay / Wait").appendField(new Blockly.FieldNumber(1000, 0), "MS").appendField("ms"); this.setPreviousStatement(true, null); this.setNextStatement(true, null); this.setColour("#9b59b6"); } };
-        arduinoGenerator['delay_ms'] = function(block) { return `  delay(${block.getFieldValue('MS')});\n`; };
+        // JavaScript code emission configuration profiles
+        const generator = new Blockly.Generator('ARDUINO');
+        generator.scrub_ = function(b, c, t) { const n = b.nextConnection && b.nextConnection.targetBlock(); return n && !t ? c + generator.blockToCode(n) : c; };
+        
+        generator['roblox_event'] = function(b) { return `  if (checkRobloxEvent("${b.getFieldValue('EV')}")) {\n`; };
+        generator['minecraft_event'] = function(b) { return `  if (checkMinecraftEvent("${b.getFieldValue('EV')}")) {\n`; };
+        generator['pokemon_event'] = function(b) { return `  if (checkPokemonEvent("${b.getFieldValue('EV')}")) {\n`; };
+        
+        generator['pin_high'] = function(b) { return `    digitalWrite(${b.getFieldValue('PIN')}, HIGH);\n`; };
+        generator['pin_low'] = function(b) { return `    digitalWrite(${b.getFieldValue('PIN')}, LOW);\n`; };
+        generator['move_motor'] = function(b) { return `    myServo.write(${b.getFieldValue('ANG')});\n`; };
+        generator['delay_ms'] = function(b) { return `    delay(${b.getFieldValue('MS')});\n`; };
 
-        // FIX: Wrapping the entire block builder setup inside a window load function so the canvas elements exist first
-        window.onload = function() {
-            const totalPinsToBuild = 14; 
-            const robloxXmlContainer = document.getElementById('cat_roblox');
-            const basicXmlContainer = document.getElementById('cat_basic');
-            const envXmlContainer = document.getElementById('cat_env');
-            const wirelessXmlContainer = document.getElementById('cat_wireless');
-            const motorsXmlContainer = document.getElementById('cat_motors');
+        // Inject the workspace container layout properties
+        const ws = Blockly.inject('blockly-area', { toolbox: document.getElementById('toolbox'), grid: { spacing: 20, length: 3, colour: '#333', snap: true }, trashcan: true });
+        setTimeout(() => { Blockly.svgResize(ws); }, 50);
 
-            let blockCounter = 0;
-
-            // 1. Roblox Events Configuration (60 blocks)
-            const robloxEvents = ["OnPlayerDeath", "OnCoinCollect", "OnBadgeEarned", "OnLevelUp", "OnItemPurchase", "OnAdminTriggered"];
-            robloxEvents.forEach(event => {
-                for(let keyID = 1; keyID <= 10; keyID++) {
-                    let bName = `roblox_${event.toLowerCase()}_key${keyID}`;
-                    Blockly.Blocks[bName] = { init: function() { this.appendDummyInput().appendField(`🎮 Roblox Event [${event}] ➡️ Node #${keyID}`); this.setPreviousStatement(true, null); this.setNextStatement(true, null); this.setColour("#e74c3c"); } };
-                    arduinoGenerator[bName] = new Function('block', `return '  if (checkRobloxServerEvent("${event}", ${keyID})) {\\n    Serial.println("Roblox Action Confirmed!");\\n  }\\n';`);
-                    robloxXmlContainer.innerHTML += `<block type="${bName}"></block>`;
-                    blockCounter++;
-                }
-            });
-
-            // 2. Hardware I/O Register Blocks Configuration (224 blocks)
-            for(let p = 0; p < totalPinsToBuild; p++) {
-                let blockNameHigh = `digital_write_p${p}_high`;
-                Blockly.Blocks[blockNameHigh] = { init: function() { this.appendDummyInput().appendField(`Digital Pin ${p} ➡️ Force HIGH State`); this.setPreviousStatement(true, null); this.setNextStatement(true, null); this.setColour("#00878f"); } };
-                arduinoGenerator[blockNameHigh] = new Function('block', `return '  pinMode(${p}, OUTPUT);\\n  digitalWrite(${p}, HIGH);\\n';`);
-                basicXmlContainer.innerHTML += `<block type="${blockNameHigh}"></block>`;
-                blockCounter++;
-
-                let blockNameLow = `digital_write_p${p}_low`;
-                Blockly.Blocks[blockNameLow] = { init: function() { this.appendDummyInput().appendField(`Digital Pin ${p} ➡️ Force LOW State`); this.setPreviousStatement(true, null); this.setNextStatement(true, null); this.setColour("#00878f"); } };
-                arduinoGenerator[blockNameLow] = new Function('block', `return '  pinMode(${p}, OUTPUT);\\n  digitalWrite(${p}, LOW);\\n';`);
-                basicXmlContainer.innerHTML += `<block type="${blockNameLow}"></block>`;
-                blockCounter++;
-
-                let blockReadName = `digital_read_p${p}`;
-                Blockly.Blocks[blockReadName] = { init: function() { this.appendDummyInput().appendField(`Read Input Pin ${p}`); this.setOutput(true, "Boolean"); this.setColour("#00878f"); } };
-                arduinoGenerator[blockReadName] = new Function('block', `return ['digitalRead(${p})', 0];`);
-                basicXmlContainer.innerHTML += `<block type="${blockReadName}"></block>`;
-                blockCounter++;
-            }
-
-            // 3. Environmental Sensors Configuration Matrix (200 blocks)
-            const envSensors = ["DHT11_Temp", "DHT22_Humidity", "BMP280_Pressure", "MQ2_Gas", "MQ7_Carbon", "LDR_Lux", "Soil_Moisture", "Flame_Detector", "Water_Level", "Rain_Sensor"];
-            envSensors.forEach(sensor => {
-                for(let ch = 0; ch <= 15; ch++) {
+        ws.addChangeListener(() => {
+            const blockCode = generator.workspaceToCode(ws);
+            let closing = (blockCode.match(/\{/g) || []).length;
+            let braces = ''; for(let i=0; i<closing; i++) braces += "  }\n";
+            document.getElementById('code').innerText = `void setup() {\n  Serial.begin(9600);\n}\n\nvoid loop() {\n${blockCode}${braces}\n}`;
+        });
+    </script>
+</body>
+</html>
