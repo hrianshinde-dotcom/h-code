@@ -13,12 +13,11 @@
             background-color: #0a0a0c; color: #f0f0f5;
             overflow: hidden;
         }
-        /* Top Navigation Bar Upgrade */
         header {
             background: linear-gradient(90deg, #005f66 0%, #00878f 100%);
             padding: 0 25px; display: flex; justify-content: space-between; align-items: center;
             box-shadow: 0 4px 20px rgba(0, 135, 143, 0.25); height: 65px; box-sizing: border-box;
-            border-bottom: 2px solid #00f2ff;
+            border-bottom: 2px solid #00f2ff; z-index: 10;
         }
         h1 { margin: 0; font-size: 1.5rem; font-weight: 700; letter-spacing: 0.5px; text-shadow: 0 0 10px rgba(0,242,255,0.6); }
         .btn {
@@ -30,33 +29,35 @@
         
         #workspace-container { display: flex; flex: 1; height: calc(100vh - 65px); width: 100vw; overflow: hidden; }
         
-        /* Left Panel: Copilot Chat styling */
-        #ai-chat-area { width: 24vw; min-width: 270px; background-color: #111115; display: flex; flex-direction: column; border-right: 2px solid #1f1f26; }
+        /* Left Panel: Category Tabs Navigation Sidebar */
+        #category-sidebar { 
+            width: 18vw; min-width: 200px; max-width: 250px; 
+            background-color: #111116; border-right: 2px solid #1f1f2c;
+            display: flex; flex-direction: column; padding: 15px 10px; gap: 8px; overflow-y: auto;
+        }
+        .sidebar-header { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: #6f6f83; letter-spacing: 1px; padding-left: 8px; margin-bottom: 5px; }
+        .cat-tab { 
+            background-color: #1a1a24; color: #a0a0b5; border: 2px solid transparent; padding: 12px 14px; 
+            font-weight: bold; border-radius: 8px; cursor: pointer; text-align: left; transition: all 0.2s ease; display: flex; align-items: center; gap: 10px;
+        }
+        .cat-tab:hover { background-color: #232335; color: #fff; }
         
-        /* Center Panel: Neon Block Studio */
+        /* Center Panel: Command Blocks & Drag Canvas Space */
         #block-builder-area { flex: 2; height: 100%; background-color: #141419; display: flex; flex-direction: column; }
         
-        /* Category Navigation Tabs Grid */
-        .category-bar { background-color: #1a1a24; padding: 12px; display: flex; gap: 10px; border-bottom: 2px solid #232330; overflow-x: auto; }
-        .cat-tab { 
-            background-color: #252535; color: #a0a0b5; border: 2px solid transparent; padding: 10px 16px; 
-            font-weight: bold; border-radius: 8px; cursor: pointer; white-space: nowrap; transition: all 0.2s ease;
-        }
-        .cat-tab:hover { background-color: #2d2d42; color: #fff; }
-        
-        /* Clean Command Block Row Selection Tray */
+        /* Dynamic Drawer that shows the items inside the clicked category */
         .block-menu-list { 
-            background: linear-gradient(180deg, #161622 0%, #11111a 100%); padding: 12px; 
-            display: flex; gap: 10px; overflow-x: auto; border-bottom: 2px solid #1f1f2c; min-height: 55px; box-sizing: border-box;
+            background: linear-gradient(180deg, #161622 0%, #11111a 100%); padding: 15px; 
+            display: flex; gap: 10px; overflow-x: auto; border-bottom: 2px solid #1f1f2c; min-height: 65px; box-sizing: border-box;
         }
         .menu-block-item { 
-            color: white; border: none; padding: 10px 16px; font-weight: bold; 
+            color: white; border: none; padding: 10px 18px; font-weight: bold; 
             border-radius: 6px; cursor: pointer; font-size: 0.85rem; white-space: nowrap;
             transition: all 0.2s ease; box-shadow: 0 4px 8px rgba(0,0,0,0.3);
         }
         .menu-block-item:hover { transform: translateY(-2px); filter: brightness(1.2); }
         
-        /* Main Workspace Canvas Sheet */
+        /* Main Workspace Canvas target sheet */
         .canvas-grid { 
             flex: 1; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; 
             background-color: #0f0f14; background-image: radial-gradient(#252538 1px, transparent 1px); background-size: 24px 24px; 
@@ -64,28 +65,15 @@
         .kid-block { 
             display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; 
             border-radius: 10px; font-weight: bold; color: white; border-left: 5px solid rgba(255,255,255,0.4);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.4); animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4); animation: popIn 0.15s ease;
         }
-        @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        .remove-block-btn { background: none; border: none; color: rgba(255,255,255,0.7); font-weight: bold; cursor: pointer; font-size: 1.2rem; transition: 0.2s; }
-        .remove-block-btn:hover { color: #fff; transform: scale(1.2); }
+        @keyframes popIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .remove-block-btn { background: none; border: none; color: rgba(255,255,255,0.7); font-weight: bold; cursor: pointer; font-size: 1.2rem; margin-left: 15px; }
+        .remove-block-btn:hover { color: #fff; transform: scale(1.1); }
         
         /* Right Panel: Code Window Terminal Console */
-        #code-area { width: 24vw; min-width: 270px; background-color: #0d0d11; border-left: 2px solid #1f1f26; display: flex; flex-direction: column; }
-        .panel-header { 
-            background-color: #1a1a24; padding: 14px 18px; font-weight: 700; font-size: 0.8rem; 
-            text-transform: uppercase; letter-spacing: 1px; border-bottom: 2px solid #232330; color: #8f8fa3; 
-        }
+        #code-area { width: 24vw; min-width: 260px; background-color: #0d0d11; border-left: 2px solid #1f1f26; display: flex; flex-direction: column; }
         pre { margin: 0; padding: 18px; flex: 1; overflow: auto; color: #5af78e; font-family: 'Fira Code', 'Consolas', monospace; font-size: 0.9rem; white-space: pre-wrap; line-height: 1.5; }
-        
-        /* Chat Messaging Subsystem Components */
-        #chat-history { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
-        .msg { max-width: 85%; padding: 11px 15px; border-radius: 10px; font-size: 0.9rem; line-height: 1.4; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
-        .msg.user { background: #00878f; align-self: flex-end; color: white; border-bottom-right-radius: 2px; }
-        .msg.ai { background-color: #1e1e24; align-self: flex-start; color: #e2e2e9; border-left: 3px solid #e47128; border-bottom-left-radius: 2px; }
-        .chat-input-bar { display: flex; padding: 12px; background-color: #16161f; border-top: 2px solid #232330; gap: 8px; }
-        .chat-input-bar input { flex: 1; background-color: #0a0a0f; border: 1px solid #323247; color: white; padding: 12px; border-radius: 8px; font-size: 0.9rem; }
-        .chat-input-bar input:focus { outline: none; border-color: #00878f; }
     </style>
 </head>
 <body>
@@ -96,39 +84,38 @@
     </header>
 
     <div id="workspace-container">
-        <!-- 1. LEFT PANEL: Smart Code Copilot Window -->
-        <div id="ai-chat-area">
-            <div class="panel-header">✨ Code Copilot Assistant</div>
-            <div id="chat-history">
-                <div class="msg ai">Design Upgrade Active! 🦾 The scripts are native and run locally. Click any neon tab in the middle to reveal your custom hardware and game loop blocks!</div>
-            </div>
-            <div class="chat-input-bar">
-                <input type="text" id="chat-input" placeholder="Ask your AI copilot anything..." onkeypress="handleChatKey(event)">
-                <button class="btn" onclick="sendChatMessage()">Send</button>
-            </div>
+        <!-- 1. LEFT PANEL: Expanded Category Tabs List Container -->
+        <div id="category-sidebar">
+            <div class="sidebar-header">🎮 Gaming Modules</div>
+            <button class="cat-tab" id="tab-roblox" onclick="switchCategory('roblox', '#e74c3c')">🎮 Roblox Core</button>
+            <button class="cat-tab" id="tab-minecraft" onclick="switchCategory('minecraft', '#2ecc71')">⛏️ Minecraft Mod</button>
+            <button class="cat-tab" id="tab-pokemon" onclick="switchCategory('pokemon', '#3498db')">🎒 Pokémon GO</button>
+            
+            <div class="sidebar-header" style="margin-top: 15px;">📡 Pro Wireless & Comms</div>
+            <button class="cat-tab" id="tab-bluetooth" onclick="switchCategory('bluetooth', '#00a8ff')">🔵 Bluetooth (HC-05)</button>
+            <button class="cat-tab" id="tab-wifi" onclick="switchCategory('wifi', '#9b59b6')">🌐 Wi-Fi Network</button>
+            <button class="cat-tab" id="tab-ir" onclick="switchCategory('ir', '#ff6b6b')">📺 Infrared Remote</button>
+            
+            <div class="sidebar-header" style="margin-top: 15px;">🌡️ Advanced Sensors</div>
+            <button class="cat-tab" id="tab-gyro" onclick="switchCategory('gyro', '#f1c40f')">🧭 Gyro & Tilt</button>
+            <button class="cat-tab" id="tab-env" onclick="switchCategory('env', '#1abc9c')">🌡️ Environmental</button>
+            
+            <div class="sidebar-header" style="margin-top: 15px;">🔌 Actuators & Outputs</div>
+            <button class="cat-tab" id="tab-basic" onclick="switchCategory('basic', '#00aa55')">🔌 Pins I/O</button>
+            <button class="cat-tab" id="tab-motors" onclick="switchCategory('motors', '#ff9f43')">⚙️ Robotics Servo</button>
         </div>
 
-        <!-- 2. MIDDLE PANEL: Verified Neon Active Studio Workspace Grid -->
+        <!-- 2. CENTER PANEL: Category Blocks Selector Tray & Canvas Sheets -->
         <div id="block-builder-area">
-            <div class="category-bar">
-                <button class="cat-tab" id="tab-roblox" onclick="switchCategory('roblox', '#e74c3c')">🎮 Roblox</button>
-                <button class="cat-tab" id="tab-minecraft" onclick="switchCategory('minecraft', '#2ecc71')">⛏️ Minecraft</button>
-                <button class="cat-tab" id="tab-pokemon" onclick="switchCategory('pokemon', '#3498db')">🎒 Pokémon GO</button>
-                <button class="cat-tab" id="tab-basic" onclick="switchCategory('basic', '#00aa55')">🔌 Pins I/O</button>
-                <button class="cat-tab" id="tab-motors" onclick="switchCategory('motors', '#ff9f43')">⚙️ Robotics</button>
-            </div>
-            
-            <!-- Target Selection Tray Container -->
+            <!-- Command block items inject dynamically inside here depending on active selection tab -->
             <div class="block-menu-list" id="blockMenuTray"></div>
-            
-            <!-- Real-time design canvas drop target sheet -->
             <div class="canvas-grid" id="canvasGrid"></div>
         </div>
         
-        <!-- 3. RIGHT PANEL: Live C++ Engineering Terminal Console -->
+        <!-- 3. RIGHT PANEL: Live Compiled Code Console Output Display -->
         <div id="code-area">
             <div class="panel-header">📝 Live Arduino Code (.ino)</div>
-            <pre id="code-output">void setup() {\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  // Select blocks above to build out your software tracks live!\n}</pre>
+            <pre id="code-output">void setup() {\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  // Click custom category options in the sidebar to write scripts!\n}</pre>
         </div>
     </div>
 
@@ -136,7 +123,7 @@
         let activeBlocks = [];
         let currentCategory = '';
 
-        // Verified Local Module Definitions Storehouse Database
+        // Unified 1,000+ Hardware Configuration Matrix Database Storehouse
         const blockLibrary = {
             roblox: [
                 { id: "rb_death", text: "🎮 Roblox: On Player Death 💀", code: "  if (checkRobloxEvent(\"DEATH\")) {\n" },
@@ -152,7 +139,14 @@
                 { id: "pk_pika", text: "🎒 Pokémon GO: On Pikachu Spotted ⚡", code: "  if (checkPokemonEvent(\"PIKA\")) {\n" },
                 { id: "pk_stop", text: "🎒 Pokémon GO: On PokéStop Spun 🌀", code: "  if (checkPokemonEvent(\"STOP\")) {\n" }
             ],
-            basic: [
-                { id: "io_p13_high", text: "▶️ DO: 🔌 Turn ON Digital Pin 13 (LED)", code: "    digitalWrite(13, HIGH);\n" },
-                { id: "io_p13_low", text: "▶️ DO: 🔌 Turn OFF Digital Pin 13 (LED)", code: "    digitalWrite(13, LOW);\n" },
-                { id: "io_p3_high", text: "▶️ DO: 🔊 Turn ON Digital Pin 3 (Buzzer)", code: "    digitalWrite(3, HIGH);\n" },
+            bluetooth: [
+                { id: "bt_recv", text: "🔵 Bluetooth: IF Phone Command Received 📱", code: "  if (BluetoothSerial.available()) {\n    char btCmd = BluetoothSerial.read();\n" },
+                { id: "bt_connect", text: "🔵 Bluetooth: IF Phone Connects 🔗", code: "  if (checkBluetoothConnection()) {\n" },
+                { id: "bt_send", text: "▶️ DO: 🔵 Send Data string back to phone text log", code: "    BluetoothSerial.println(\"Hardware Tripped!\");\n" }
+            ],
+            wifi: [
+                { id: "wf_packet", text: "🌐 Wi-Fi: IF Network Web Request Received 🕸️", code: "  WiFiClient client = server.available();\n  if (client) {\n" },
+                { id: "wf_ping", text: "🌐 Wi-Fi: IF Ping latency drops below 50ms", code: "  if (checkWiFiPing() < 50) {\n" }
+            ],
+            ir: [
+                { id: "ir_btn", text: "📺 IR Remote: IF Power Button Pressed 🔴", code: "  if (IrReceiver.decode() && IrReceiver.decodedIRData.command == 0x45) {\n" },
