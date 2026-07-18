@@ -6,69 +6,101 @@
     <title>robot robot Studio Pro</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, sans-serif;
+            font-family: 'Segoe UI', -apple-system, sans-serif;
             margin: 0; padding: 0;
             display: flex; flex-direction: column;
-            height: 100vh; background-color: #121212; color: #ffffff;
+            height: 100vh; width: 100vw;
+            background-color: #0a0a0c; color: #f0f0f5;
             overflow: hidden;
         }
+        /* Top Navigation Bar Upgrade */
         header {
-            background-color: #00878f; /* Arduino Teal */
-            padding: 10px 20px; display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3); height: 60px; box-sizing: border-box;
+            background: linear-gradient(90deg, #005f66 0%, #00878f 100%);
+            padding: 0 25px; display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 135, 143, 0.25); height: 65px; box-sizing: border-box;
+            border-bottom: 2px solid #00f2ff;
         }
-        h1 { margin: 0; font-size: 1.3rem; font-weight: 600; }
+        h1 { margin: 0; font-size: 1.5rem; font-weight: 700; letter-spacing: 0.5px; text-shadow: 0 0 10px rgba(0,242,255,0.6); }
         .btn {
-            background-color: #e47128; color: white; border: none;
-            padding: 10px 16px; font-weight: bold; border-radius: 6px;
-            cursor: pointer; transition: 0.2s ease;
+            background: linear-gradient(135deg, #e47128 0%, #ff8e42 100%); color: white; border: none;
+            padding: 10px 20px; font-weight: bold; border-radius: 8px; font-size: 0.9rem;
+            cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 10px rgba(228,113,40,0.3);
         }
-        .btn:hover { background-color: #c55d1d; }
+        .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 15px rgba(228,113,40,0.5); }
         
-        #workspace-container { display: flex; flex: 1; height: calc(100vh - 60px); width: 100vw; overflow: hidden; }
+        #workspace-container { display: flex; flex: 1; height: calc(100vh - 65px); width: 100vw; overflow: hidden; }
         
-        /* Left Panel: Local Copilot Chat */
-        #ai-chat-area { width: 25vw; min-width: 260px; background-color: #181818; display: flex; flex-direction: column; border-right: 2px solid #2d2d2d; }
+        /* Left Panel: Copilot Chat styling */
+        #ai-chat-area { width: 24vw; min-width: 270px; background-color: #111115; display: flex; flex-direction: column; border-right: 2px solid #1f1f26; }
         
-        /* Center Panel: Uncrashable Visual Block Studio */
-        #block-builder-area { flex: 2; height: 100%; background-color: #1e1e1e; display: flex; flex-direction: column; }
-        .category-bar { background-color: #252526; padding: 10px; display: flex; gap: 8px; border-bottom: 2px solid #2d2d2d; overflow-x: auto; }
-        .cat-tab { background-color: #333; color: #ccc; border: none; padding: 8px 14px; font-weight: bold; border-radius: 6px; cursor: pointer; white-space: nowrap; }
-        .cat-tab.active { background-color: #e74c3c; color: white; }
+        /* Center Panel: Neon Block Studio */
+        #block-builder-area { flex: 2; height: 100%; background-color: #141419; display: flex; flex-direction: column; }
         
-        .block-menu-list { background-color: #161618; padding: 10px; display: flex; gap: 8px; overflow-x: auto; border-bottom: 1px solid #2d2d2d; min-height: 45px; }
-        .menu-block-item { color: white; border: none; padding: 10px 14px; font-weight: bold; border-radius: 6px; cursor: pointer; font-size: 0.85rem; white-space: nowrap; }
+        /* Category Navigation Tabs Grid */
+        .category-bar { background-color: #1a1a24; padding: 12px; display: flex; gap: 10px; border-bottom: 2px solid #232330; overflow-x: auto; }
+        .cat-tab { 
+            background-color: #252535; color: #a0a0b5; border: 2px solid transparent; padding: 10px 16px; 
+            font-weight: bold; border-radius: 8px; cursor: pointer; white-space: nowrap; transition: all 0.2s ease;
+        }
+        .cat-tab:hover { background-color: #2d2d42; color: #fff; }
         
-        .canvas-grid { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background-image: radial-gradient(#333 1px, transparent 1px); background-size: 20px 20px; }
-        .kid-block { display: flex; align-items: center; justify-content: space-between; padding: 12px 15px; border-radius: 8px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
-        .remove-block-btn { background: none; border: none; color: white; font-weight: bold; cursor: pointer; font-size: 1.1rem; }
+        /* Clean Command Block Row Selection Tray */
+        .block-menu-list { 
+            background: linear-gradient(180deg, #161622 0%, #11111a 100%); padding: 12px; 
+            display: flex; gap: 10px; overflow-x: auto; border-bottom: 2px solid #1f1f2c; min-height: 55px; box-sizing: border-box;
+        }
+        .menu-block-item { 
+            color: white; border: none; padding: 10px 16px; font-weight: bold; 
+            border-radius: 6px; cursor: pointer; font-size: 0.85rem; white-space: nowrap;
+            transition: all 0.2s ease; box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        .menu-block-item:hover { transform: translateY(-2px); filter: brightness(1.2); }
         
-        /* Right Panel: Live Code Terminal */
-        #code-area { width: 25vw; min-width: 260px; background-color: #1a1a1a; border-left: 2px solid #2d2d2d; display: flex; flex-direction: column; }
-        .panel-header { background-color: #252526; padding: 12px 15px; font-weight: bold; font-size: 0.85rem; text-transform: uppercase; border-bottom: 2px solid #2d2d2d; color: #cccccc; }
-        pre { margin: 0; padding: 15px; flex: 1; overflow: auto; color: #a9dc76; font-family: 'Consolas', monospace; font-size: 0.9rem; white-space: pre-wrap; line-height: 1.4; }
+        /* Main Workspace Canvas Sheet */
+        .canvas-grid { 
+            flex: 1; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; 
+            background-color: #0f0f14; background-image: radial-gradient(#252538 1px, transparent 1px); background-size: 24px 24px; 
+        }
+        .kid-block { 
+            display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; 
+            border-radius: 10px; font-weight: bold; color: white; border-left: 5px solid rgba(255,255,255,0.4);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4); animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+        }
+        @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .remove-block-btn { background: none; border: none; color: rgba(255,255,255,0.7); font-weight: bold; cursor: pointer; font-size: 1.2rem; transition: 0.2s; }
+        .remove-block-btn:hover { color: #fff; transform: scale(1.2); }
         
+        /* Right Panel: Code Window Terminal Console */
+        #code-area { width: 24vw; min-width: 270px; background-color: #0d0d11; border-left: 2px solid #1f1f26; display: flex; flex-direction: column; }
+        .panel-header { 
+            background-color: #1a1a24; padding: 14px 18px; font-weight: 700; font-size: 0.8rem; 
+            text-transform: uppercase; letter-spacing: 1px; border-bottom: 2px solid #232330; color: #8f8fa3; 
+        }
+        pre { margin: 0; padding: 18px; flex: 1; overflow: auto; color: #5af78e; font-family: 'Fira Code', 'Consolas', monospace; font-size: 0.9rem; white-space: pre-wrap; line-height: 1.5; }
+        
+        /* Chat Messaging Subsystem Components */
         #chat-history { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
-        .msg { max-width: 85%; padding: 10px 14px; border-radius: 8px; font-size: 0.9rem; }
-        .msg.user { background-color: #00878f; align-self: flex-end; }
-        .msg.ai { background-color: #2d2d2d; align-self: flex-start; border-left: 3px solid #e47128; }
-        .chat-input-bar { display: flex; padding: 12px; background-color: #212121; border-top: 1px solid #2d2d2d; gap: 8px; }
-        .chat-input-bar input { flex: 1; background-color: #121212; border: 1px solid #3c3c3c; color: white; padding: 12px; border-radius: 6px; }
+        .msg { max-width: 85%; padding: 11px 15px; border-radius: 10px; font-size: 0.9rem; line-height: 1.4; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+        .msg.user { background: #00878f; align-self: flex-end; color: white; border-bottom-right-radius: 2px; }
+        .msg.ai { background-color: #1e1e24; align-self: flex-start; color: #e2e2e9; border-left: 3px solid #e47128; border-bottom-left-radius: 2px; }
+        .chat-input-bar { display: flex; padding: 12px; background-color: #16161f; border-top: 2px solid #232330; gap: 8px; }
+        .chat-input-bar input { flex: 1; background-color: #0a0a0f; border: 1px solid #323247; color: white; padding: 12px; border-radius: 8px; font-size: 0.9rem; }
+        .chat-input-bar input:focus { outline: none; border-color: #00878f; }
     </style>
 </head>
 <body>
 
     <header>
         <h1>🤖 robot robot Studio Pro</h1>
-        <button class="btn" onclick="copyArduinoCode()">📋 Copy C++ Code</button>
+        <button class="btn" onclick="copyArduinoCode()">📋 Copy Code Matrix</button>
     </header>
 
     <div id="workspace-container">
-        <!-- 1. LEFT PANEL: Uncrashable Copilot Chat -->
+        <!-- 1. LEFT PANEL: Smart Code Copilot Window -->
         <div id="ai-chat-area">
-            <div class="panel-header">✨ Step 1: Code Copilot</div>
+            <div class="panel-header">✨ Code Copilot Assistant</div>
             <div id="chat-history">
-                <div class="msg ai">Fixed! 🦾 The faulty internet files were completely skipped. This standalone studio has loaded natively. Click any category tab in the middle and hit a block button to write code loops!</div>
+                <div class="msg ai">Design Upgrade Active! 🦾 The scripts are native and run locally. Click any neon tab in the middle to reveal your custom hardware and game loop blocks!</div>
             </div>
             <div class="chat-input-bar">
                 <input type="text" id="chat-input" placeholder="Ask your AI copilot anything..." onkeypress="handleChatKey(event)">
@@ -76,76 +108,51 @@
             </div>
         </div>
 
-        <!-- 2. MIDDLE PANEL: Pure Local Code Block Canvas Grid -->
+        <!-- 2. MIDDLE PANEL: Verified Neon Active Studio Workspace Grid -->
         <div id="block-builder-area">
             <div class="category-bar">
-                <button class="cat-tab active" id="tab-roblox" onclick="switchCategory('roblox', '#e74c3c')">🎮 Roblox</button>
+                <button class="cat-tab" id="tab-roblox" onclick="switchCategory('roblox', '#e74c3c')">🎮 Roblox</button>
                 <button class="cat-tab" id="tab-minecraft" onclick="switchCategory('minecraft', '#2ecc71')">⛏️ Minecraft</button>
                 <button class="cat-tab" id="tab-pokemon" onclick="switchCategory('pokemon', '#3498db')">🎒 Pokémon GO</button>
-                <button class="cat-tab" id="tab-basic" onclick="switchCategory('basic', '#00878f')">🔌 Pins I/O</button>
-                <button class="cat-tab" id="tab-motors" onclick="switchCategory('motors', '#e67e22')">⚙️ Robotics</button>
+                <button class="cat-tab" id="tab-basic" onclick="switchCategory('basic', '#00aa55')">🔌 Pins I/O</button>
+                <button class="cat-tab" id="tab-motors" onclick="switchCategory('motors', '#ff9f43')">⚙️ Robotics</button>
             </div>
             
+            <!-- Target Selection Tray Container -->
             <div class="block-menu-list" id="blockMenuTray"></div>
+            
+            <!-- Real-time design canvas drop target sheet -->
             <div class="canvas-grid" id="canvasGrid"></div>
         </div>
         
-        <!-- 3. RIGHT PANEL: Live C++ Generated Code -->
+        <!-- 3. RIGHT PANEL: Live C++ Engineering Terminal Console -->
         <div id="code-area">
-            <div class="panel-header">📝 Step 2: Compiled Code (.ino)</div>
-            <pre id="code-output">void setup() {\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  // Click top selection buttons to build loops live!\n}</pre>
+            <div class="panel-header">📝 Live Arduino Code (.ino)</div>
+            <pre id="code-output">void setup() {\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  // Select blocks above to build out your software tracks live!\n}</pre>
         </div>
     </div>
 
     <script>
         let activeBlocks = [];
-        let currentCategory = 'roblox';
-        let currentThemeColor = '#e74c3c';
+        let currentCategory = '';
 
-        // Static Local Library Definitions—No cloud fetching required!
+        // Verified Local Module Definitions Storehouse Database
         const blockLibrary = {
             roblox: [
-                { id: "rb_death", text: "🎮 Roblox Loop: On Player Death 💀", code: "  if (checkRobloxEvent(\"DEATH\")) {\n" },
-                { id: "rb_coin", text: "🎮 Roblox Loop: On Coin Collect 🪙", code: "  if (checkRobloxEvent(\"COIN\")) {\n" },
-                { id: "rb_admin", text: "🎮 Roblox Loop: On Admin Activated 👑", code: "  if (checkRobloxEvent(\"ADMIN\")) {\n" }
+                { id: "rb_death", text: "🎮 Roblox: On Player Death 💀", code: "  if (checkRobloxEvent(\"DEATH\")) {\n" },
+                { id: "rb_coin", text: "🎮 Roblox: On Coin Collect 🪙", code: "  if (checkRobloxEvent(\"COIN\")) {\n" },
+                { id: "rb_admin", text: "🎮 Roblox: On Admin Mode On 👑", code: "  if (checkRobloxEvent(\"ADMIN\")) {\n" }
             ],
             minecraft: [
-                { id: "mc_creeper", text: "⛏️ Minecraft Loop: On Creeper Exploded 💥", code: "  if (checkMinecraftEvent(\"CREEPER\")) {\n" },
-                { id: "mc_diamond", text: "⛏️ Minecraft Loop: On Diamond Mined 💎", code: "  if (checkMinecraftEvent(\"DIAMOND\")) {\n" },
-                { id: "mc_damage", text: "⛏️ Minecraft Loop: On Player Damaged 💔", code: "  if (checkMinecraftEvent(\"DAMAGE\")) {\n" }
+                { id: "mc_creeper", text: "⛏️ Minecraft: On Creeper Exploded 💥", code: "  if (checkMinecraftEvent(\"CREEPER\")) {\n" },
+                { id: "mc_diamond", text: "⛏️ Minecraft: On Diamond Mined 💎", code: "  if (checkMinecraftEvent(\"DIAMOND\")) {\n" },
+                { id: "mc_damage", text: "⛏️ Minecraft: On Player Damaged 💔", code: "  if (checkMinecraftEvent(\"DAMAGE\")) {\n" }
             ],
             pokemon: [
-                { id: "pk_pika", text: "🎒 Pokémon GO Loop: On Pikachu Spotted ⚡", code: "  if (checkPokemonEvent(\"PIKA\")) {\n" },
-                { id: "pk_stop", text: "🎒 Pokémon GO Loop: On PokéStop Spun 🌀", code: "  if (checkPokemonEvent(\"STOP\")) {\n" }
+                { id: "pk_pika", text: "🎒 Pokémon GO: On Pikachu Spotted ⚡", code: "  if (checkPokemonEvent(\"PIKA\")) {\n" },
+                { id: "pk_stop", text: "🎒 Pokémon GO: On PokéStop Spun 🌀", code: "  if (checkPokemonEvent(\"STOP\")) {\n" }
             ],
             basic: [
-                { id: "io_p13_high", text: "▶️ THEN DO: 🔌 Turn ON Digital Pin 13 (LED)", code: "    digitalWrite(13, HIGH);\n" },
-                { id: "io_p13_low", text: "▶️ THEN DO: 🔌 Turn OFF Digital Pin 13 (LED)", code: "    digitalWrite(13, LOW);\n" },
-                { id: "io_p3_high", text: "▶️ THEN DO: 🔊 Turn ON Digital Pin 3 (Buzzer)", code: "    digitalWrite(3, HIGH);\n" },
-                { id: "io_p3_low", text: "▶️ THEN DO: 🔊 Turn OFF Digital Pin 3 (Buzzer)", code: "    digitalWrite(3, LOW);\n" },
-                { id: "io_delay_1s", text: "▶️ THEN DO: ⏱️ Wait/Delay for 1 Second", code: "    delay(1000);\n" }
-            ],
-            motors: [
-                { id: "mot_p9_90", text: "▶️ THEN DO: ⚙️ Steer Servo Pin 9 to 90°", code: "    myServo.write(90);\n" },
-                { id: "mot_p9_0", text: "▶️ THEN DO: ⚙️ Steer Servo Pin 9 to 0°", code: "    myServo.write(0);\n" }
-            ]
-        };
-
-        function switchCategory(catName, colorCode) {
-            currentCategory = catName; currentThemeColor = colorCode;
-            document.querySelectorAll('.cat-tab').forEach(btn => { btn.classList.remove('active'); btn.style.backgroundColor = '#333'; });
-            const activeTab = document.getElementById(`tab-${catName}`);
-            activeTab.classList.add('active'); activeTab.style.backgroundColor = colorCode;
-
-            const tray = document.getElementById('blockMenuTray'); tray.innerHTML = '';
-            blockLibrary[catName].forEach(block => {
-                const item = document.createElement('button'); item.className = 'menu-block-item';
-                item.style.backgroundColor = colorCode; item.innerText = block.text;
-                item.onclick = () => { addBlockToCanvas(block) }; tray.appendChild(item);
-            });
-        }
-
-        function addBlockToCanvas(block) { activeBlocks.push({ ...block, theme: currentThemeColor }); renderCanvasAndCode(); }
-        function removeBlockFromCanvas(index) { activeBlocks.splice(index, 1); renderCanvasAndCode(); }
-
-        function renderCanvasAndCode() {
+                { id: "io_p13_high", text: "▶️ DO: 🔌 Turn ON Digital Pin 13 (LED)", code: "    digitalWrite(13, HIGH);\n" },
+                { id: "io_p13_low", text: "▶️ DO: 🔌 Turn OFF Digital Pin 13 (LED)", code: "    digitalWrite(13, LOW);\n" },
+                { id: "io_p3_high", text: "▶️ DO: 🔊 Turn ON Digital Pin 3 (Buzzer)", code: "    digitalWrite(3, HIGH);\n" },
