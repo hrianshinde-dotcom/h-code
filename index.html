@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>robot robot Studio Pro</title>
+    <style>
+        /* Modern Neon Cyberpunk Theme */
+        body {
+            font-family: 'Segoe UI', -apple-system, sans-serif;
+            margin: 0; padding: 0;
+            display: flex; flex-direction: column;
+            height: 100vh; width: 100vw; background-color: #0a0a0c; color: #f0f0f5;
+            overflow: hidden;
+        }
+        header {
+            background: linear-gradient(90deg, #005f66 0%, #00878f 100%);
+            padding: 0 25px; display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 135, 143, 0.25); height: 65px; box-sizing: border-box;
+            border-bottom: 2px solid #00f2ff; z-index: 10;
+        }
+        h1 { margin: 0; font-size: 1.5rem; font-weight: 700; text-shadow: 0 0 10px rgba(0,242,255,0.6); }
+        .btn {
+            background: linear-gradient(135deg, #e47128 0%, #ff8e42 100%); color: white; border: none;
+            padding: 10px 20px; font-weight: bold; border-radius: 8px; font-size: 0.9rem;
+            cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 10px rgba(228,113,40,0.3);
+        }
+        .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 15px rgba(228,113,40,0.5); }
+        
+        #workspace-container { display: flex; flex: 1; height: calc(100vh - 65px); width: 100vw; overflow: hidden; }
+        
+        /* Left Panel: Category Tabs Sidebar */
+        #category-sidebar { 
+            width: 220px; background-color: #111116; border-right: 2px solid #1f1f2c;
+            display: flex; flex-direction: column; padding: 15px 10px; gap: 8px; overflow-y: auto;
+        }
+        .sidebar-header { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: #6f6f83; letter-spacing: 1px; padding-left: 8px; margin-bottom: 5px; }
+        .cat-tab { 
+            background-color: #1a1a24; color: #a0a0b5; border: 2px solid transparent; padding: 12px 14px; 
+            font-weight: bold; border-radius: 8px; cursor: pointer; text-align: left; transition: all 0.2s ease;
+        }
+        .cat-tab:hover { background-color: #232335; color: #fff; }
+        
+        /* Middle Panel: Visual Blocks Tray & Canvas Grid */
+        #block-builder-area { flex: 2; height: 100%; background-color: #141419; display: flex; flex-direction: column; }
+        .block-menu-list { 
+            background: linear-gradient(180deg, #161622 0%, #11111a 100%); padding: 15px; 
+            display: flex; gap: 10px; overflow-x: auto; border-bottom: 2px solid #1f1f2c; min-height: 65px; box-sizing: border-box;
+        }
+        .menu-block-item { 
+            color: white; border: none; padding: 10px 18px; font-weight: bold; 
+            border-radius: 6px; cursor: pointer; font-size: 0.85rem; white-space: nowrap;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        .menu-block-item:hover { filter: brightness(1.2); }
+        
+        /* Visual Canvas Drag & Drop Grid Space */
+        .canvas-grid { 
+            flex: 1; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; 
+            background-color: #0f0f14; background-image: radial-gradient(#252538 1px, transparent 1px); background-size: 24px 24px; 
+        }
+        .kid-block { 
+            display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; 
+            border-radius: 10px; font-weight: bold; color: white; border-left: 5px solid rgba(255,255,255,0.4);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4); animation: popIn 0.15s ease;
+        }
+        @keyframes popIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .remove-block-btn { background: none; border: none; color: rgba(255,255,255,0.7); font-weight: bold; cursor: pointer; font-size: 1.2rem; margin-left: 15px; }
+        
+        /* Right Panel: Live Code Output Console Terminal */
+        #code-area { width: 320px; background-color: #0d0d11; border-left: 2px solid #1f1f26; display: flex; flex-direction: column; }
+        .panel-header { background-color: #1a1a24; padding: 14px 18px; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; border-bottom: 2px solid #232330; color: #8f8fa3; }
+        pre { margin: 0; padding: 18px; flex: 1; overflow: auto; color: #5af78e; font-family: 'Fira Code', 'Consolas', monospace; font-size: 0.85rem; white-space: pre-wrap; line-height: 1.5; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🤖 robot robot Studio Pro</h1>
+        <button class="btn" onclick="copyArduinoCode()">📋 Copy Code Matrix</button>
+    </header>
+
+    <div id="workspace-container">
+        <!-- 1. LEFT SIDEBAR: Expanded Category Tabs Navigation Drawer -->
+        <div id="category-sidebar">
+            <div class="sidebar-header">📡 Physical Electronic Sensors</div>
+            <button class="cat-tab" id="tab-ultrasonic" onclick="switchCategory('ultrasonic', '#00b894')">📏 Ultrasonic Distance</button>
+            <button class="cat-tab" id="tab-bluetooth" onclick="switchCategory('bluetooth', '#00a8ff')">🔵 Bluetooth (HC-05)</button>
+            <button class="cat-tab" id="tab-gyro" onclick="switchCategory('gyro', '#f1c40f')">🧭 Gyro & Tilt Tracker</button>
+            <button class="cat-tab" id="tab-weather" onclick="switchCategory('weather', '#1abc9c')">🌡️ Temp & Light Suites</button>
+            
+            <div class="sidebar-header" style="margin-top: 15px;">🔌 Actuators & Pins</div>
+            <button class="cat-tab" id="tab-basic" onclick="switchCategory('basic', '#00aa55')">🔌 Digital/PWM Pins</button>
+            <button class="cat-tab" id="tab-motors" onclick="switchCategory('motors', '#ff9f43')">⚙️ Servo Joint Arms</button>
+
+            <div class="sidebar-header" style="margin-top: 15px;">🎮 Video Game Triggers</div>
+            <button class="cat-tab" id="tab-roblox" onclick="switchCategory('roblox', '#e74c3c')">🎮 Roblox Engine</button>
+            <button class="cat-tab" id="tab-minecraft" onclick="switchCategory('minecraft', '#2ecc71')">⛏️ Minecraft Mod</button>
+            <button class="cat-tab" id="tab-pokemon" onclick="switchCategory('pokemon', '#3498db')">🎒 Pokémon GO Tracks</button>
+        </div>
+
+        <!-- 2. CENTER PANEL: Selected Blocks Drawer Tray & Main Grid Canvas -->
+        <div id="block-builder-area">
+            <div class="block-menu-list" id="blockMenuTray"></div>
+            <div class="canvas-grid" id="canvasGrid"></div>
+        </div>
+        
+        <!-- 3. RIGHT PANEL: Live Auto-Compiled C++ Hardware Code -->
+        <div id="code-area">
+            <div class="panel-header">📝 Live Arduino Code (.ino)</div>
+            <pre id="code-output">void setup() {\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  // Click custom category options in the sidebar to write scripts live!\n}</pre>
+        </div>
+    </div>
+
+    <script>
+        let activeBlocks = [];
+        let currentCategory = '';
+
+        // Unified Local Database Storehouse containing blocks for all your modules
+        const blockLibrary = {
+            ultrasonic: [
+                { id: "us_close", text: "📏 Ultrasonic Sound Radar: IF Object is too Close (<15cm)", code: "  long duration, distance;\n  digitalWrite(A0, LOW); delayMicroseconds(2);\n  digitalWrite(A0, HIGH); delayMicroseconds(10);\n  digitalWrite(A0, LOW);\n  duration = pulseIn(A1, HIGH);\n  distance = duration * 0.034 / 2;\n  if (distance < 15) {\n" },
+                { id: "us_clear", text: "📏 Ultrasonic Sound Radar: IF Path Ahead is Completely Clear", code: "  long duration, distance;\n  digitalWrite(A0, LOW); delayMicroseconds(2);\n  digitalWrite(A0, HIGH); delayMicroseconds(10);\n  digitalWrite(A0, LOW);\n  duration = pulseIn(A1, HIGH);\n  distance = duration * 0.034 / 2;\n  if (distance >= 50) {\n" }
+            ],
+            bluetooth: [
+                { id: "bt_read", text: "🔵 Bluetooth link: IF Phone Sends Character Signal Command 📱", code: "  if (BluetoothSerial.available()) {\n    char cmd = BluetoothSerial.read();\n" },
+                { id: "bt_send", text: "▶️ DO: 🔵 Transmit 'Warning! Threshold Triggered' to Phone log", code: "    BluetoothSerial.println(\"Warning! Threshold Triggered.\");\n" }
+            ],
+            gyro: [
+                { id: "gy_tilt", text: "🧭 Gyroscope: IF Robot tilts sideways past 45 Degrees", code: "  if (readGyroAxis('X') > 45 || readGyroAxis('X') < -45) {\n" },
+                { id: "gy_crash", text: "🧭 Gyroscope: IF Sudden Impact/Freefall acceleration Spike Hits 💥", code: "  if (readAccelerationSpike() > 3.5) {\n" }
+            ],
+            weather: [
+                { id: "sn_hot", text: "🌡️ Thermometer: IF Temperature reads Hot (>35°C) 🔥", code: "  if (readTemperatureDHT() > 35) {\n" },
+                { id: "sn_dark", text: "👁️ Light Eye: IF Room light fades into pitch Darkness 🌙", code: "  if (analogRead(A2) < 150) {\n" }
+            ],
+            basic: [
+                { id: "io_13_high", text: "▶️ DO: 🔌 Turn ON Digital Pin 13 (Built-in LED)", code: "    digitalWrite(13, HIGH);\n" },
+                { id: "io_13_low", text: "▶️ DO: 🔌 Turn OFF Digital Pin 13 (Built-in LED)", code: "    digitalWrite(13, LOW);\n" },
+                { id: "io_3_high", text: "▶️ DO: 🔊 Turn ON Digital Pin 3 (Alarm Buzzer)", code: "    digitalWrite(3, HIGH);\n" },
+                { id: "io_3_low", text: "▶️ DO: 🔊 Turn OFF Digital Pin 3 (Alarm Buzzer)", code: "    digitalWrite(3, LOW);\n" },
+                { id: "io_delay", text: "▶️ DO: ⏱️ Standby Wait/Delay for 1 Second (1000ms)", code: "    delay(1000);\n" }
+            ],
+            motors: [
+                { id: "mot_90", text: "▶️ DO: ⚙️ Rotate Robotic Servo Arm Joint Pin 9 to 90°", code: "    myServo.write(90);\n" },
