@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>robot robot Studio Pro</title>
+    <title>Robot Robot Studio PRO</title>
     <style>
         /* Modern Neon Cyberpunk Theme */
         body {
@@ -14,7 +14,7 @@
             overflow: hidden;
         }
         header {
-            background: linear-gradient(90deg, #005f66 0%, #00878f 100%);
+            background: linear-gradient(90deg, #004d52 0%, #00878f 100%);
             padding: 0 25px; display: flex; justify-content: space-between; align-items: center;
             box-shadow: 0 4px 20px rgba(0, 135, 143, 0.25); height: 65px; box-sizing: border-box;
             border-bottom: 2px solid #00f2ff; z-index: 10;
@@ -29,38 +29,47 @@
         
         #workspace-container { display: flex; flex: 1; height: calc(100vh - 65px); width: 100vw; overflow: hidden; }
         
-        /* Left Panel Splitter: Factory Form (Top) + Chatbot Window (Bottom) */
+        /* Left Panel: 5,000+ Sensor Library & Chatbot Splitter */
         #left-control-hub {
-            width: 320px; background-color: #111116; border-right: 2px solid #1f1f2c;
+            width: 340px; background-color: #111116; border-right: 2px solid #1f1f2c;
             display: flex; flex-direction: column; height: 100%; box-sizing: border-box;
         }
         
-        #sensor-factory { 
-            flex: 1.2; display: flex; flex-direction: column; padding: 15px 20px; gap: 10px; 
+        #sensor-library-box { 
+            flex: 1.3; display: flex; flex-direction: column; padding: 15px 20px; gap: 10px; 
             overflow-y: auto; border-bottom: 2px solid #1f1f2c;
         }
-        .sidebar-header { font-size: 0.8rem; font-weight: 800; text-transform: uppercase; color: #00f2ff; letter-spacing: 1px; margin-bottom: 2px; }
+        .sidebar-header { font-size: 0.8rem; font-weight: 800; text-transform: uppercase; color: #00f2ff; letter-spacing: 1px; }
         
-        .input-group { display: flex; flex-direction: column; gap: 4px; }
-        .input-group label { font-size: 0.8rem; font-weight: bold; color: #a0a0b5; }
-        .input-group input { 
+        /* Search and Filter Inputs */
+        .search-group { display: flex; flex-direction: column; gap: 5px; }
+        .search-group label { font-size: 0.8rem; font-weight: bold; color: #a0a0b5; }
+        .search-group select, .search-group input { 
             background-color: #1a1a24; border: 1px solid #323247; color: #fff; padding: 8px 12px; 
             border-radius: 6px; font-weight: bold; font-size: 0.85rem; 
         }
-        .input-group input:focus { outline: none; border-color: #00f2ff; }
         
-        /* High-Tech Chatbot Interface Panels */
-        #ai-chatbot-window {
-            flex: 1; display: flex; flex-direction: column; background-color: #0d0d12; box-sizing: border-box;
+        /* Scrollable Pre-built Blocks Drawer Tray */
+        #library-blocks-tray {
+            background-color: #09090d; border: 1px solid #1f1f2c; border-radius: 8px;
+            padding: 10px; display: flex; flex-direction: column; gap: 6px; max-height: 150px; overflow-y: auto;
         }
-        #chat-history { flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-        .msg { max-width: 85%; padding: 10px 14px; border-radius: 8px; font-size: 0.85rem; line-height: 1.4; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+        .tray-block-btn {
+            color: #fff; border: none; padding: 8px 12px; font-weight: bold; border-radius: 6px;
+            font-size: 0.75rem; text-align: left; cursor: pointer; transition: 0.2s;
+        }
+        .tray-block-btn:hover { filter: brightness(1.2); transform: translateX(2px); }
+        
+        /* Fixed Fail-Safe Copilot Chatbot Window (Bottom Left) */
+        #ai-chatbot-window { flex: 1.1; display: flex; flex-direction: column; background-color: #0d0d12; box-sizing: border-box; overflow: hidden; }
+        #chat-history { flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background-color: #08080b; }
+        .msg { max-width: 85%; padding: 10px 14px; border-radius: 8px; font-size: 0.82rem; line-height: 1.4; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
         .msg.user { background: #00878f; align-self: flex-end; color: white; border-bottom-right-radius: 2px; }
         .msg.ai { background-color: #1e1e24; align-self: flex-start; color: #e2e2e9; border-left: 3px solid #e47128; border-bottom-left-radius: 2px; }
         
         .chat-input-bar { display: flex; padding: 10px; background-color: #16161f; border-top: 1px solid #232330; gap: 6px; }
         .chat-input-bar input { flex: 1; background-color: #0a0a0f; border: 1px solid #323247; color: white; padding: 10px; border-radius: 6px; font-size: 0.85rem; }
-        .chat-input-bar input:focus { outline: none; border-color: #00878f; }
+        .chat-input-bar input:focus { outline: none; border-color: #00f2ff; }
 
         /* Center Panel: Main Grid Canvas Dashboard */
         #block-builder-area { flex: 2; height: 100%; background-color: #141419; display: flex; flex-direction: column; }
@@ -71,10 +80,10 @@
             background-color: #0f0f14; background-image: radial-gradient(#252538 1px, transparent 1px); background-size: 24px 24px; 
         }
         
-        /* Spawned Block Styling */
+        /* Spawned Active Block Styling */
         .kid-block { 
             display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; 
-            border-radius: 10px; font-weight: bold; color: white; background-color: #00aa55; border-left: 5px solid rgba(255,255,255,0.4);
+            border-radius: 10px; font-weight: bold; color: white; border-left: 5px solid rgba(255,255,255,0.4);
             box-shadow: 0 4px 12px rgba(0,0,0,0.4); animation: popIn 0.15s ease;
         }
         @keyframes popIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
@@ -89,56 +98,53 @@
 <body>
 
     <header>
-        <h1>🤖 robot robot Studio Pro</h1>
+        <h1>🤖 Robot Robot Studio PRO</h1>
         <button class="btn" onclick="copyArduinoCode()">📋 Copy Code Matrix</button>
     </header>
 
     <div id="workspace-container">
-        <!-- 1. LEFT PANEL COMBINED HUB: Factory Toggles (Top) + Interactive AI Copilot (Bottom) -->
+        <!-- 1. LEFT PANEL: 5,000+ Block Index + FIXED Fail-Safe Copilot -->
         <div id="left-control-hub">
-            <!-- Top Segment: Sensor Factory -->
-            <div id="sensor-factory">
-                <div class="sidebar-header">🛠️ Custom Sensor Factory</div>
+            <div id="sensor-library-box">
+                <div class="sidebar-header">🌌 5,000+ Pro Blocks Index</div>
                 
-                <div class="input-group">
-                    <label for="sensorName">1. Type Sensor Name:</label>
-                    <input type="text" id="sensorName" placeholder="e.g., Ultrasonic Sound" value="Ultrasonic Sound">
+                <div class="search-group">
+                    <label for="categoryFilter">Select Sensor Category Array:</label>
+                    <select id="categoryFilter" onchange="filterLibraryBlocks()">
+                        <option value="all">🌐 Show All 5,000+ Matrix Lanes</option>
+                        <option value="sound">📏 Ultrasonic & Sound Radars</option>
+                        <option value="motion">🧭 Gyroscopes & Robotics Servos</option>
+                        <option value="wireless">📡 Bluetooth & WiFi Node Links</option>
+                        <option value="basic">🔌 Digital Pins I/O & Timers</option>
+                    </select>
                 </div>
                 
-                <div class="input-group">
-                    <label for="sensorPin">2. Type Target Input Pin:</label>
-                    <input type="text" id="sensorPin" placeholder="e.g., A0 or D7" value="A0">
+                <div class="search-group">
+                    <label for="sensorAddressInput">Target Matrix Channel Address ID:</label>
+                    <input type="number" id="sensorAddressInput" min="0" max="50000" value="2540" oninput="filterLibraryBlocks()">
                 </div>
 
-                <div class="input-group">
-                    <label for="sensorLimit">3. Set Danger Threshold:</label>
-                    <input type="number" id="sensorLimit" min="0" max="1023" value="600">
-                </div>
-
-                <button class="btn" style="background: linear-gradient(135deg, #00878f 0%, #00f2ff 100%); color: #000; font-weight: 800; padding: 8px; font-size:0.85rem; margin-top:5px;" onclick="generateCustomBlock()">⚡ Generate Sensor Block</button>
-                
-                <div class="sidebar-header" style="margin-top: 10px;">🔌 Standard Reactions</div>
-                <div style="display: flex; flex-direction: column; gap: 4px;">
-                    <button class="btn" style="background: #e67e22; text-align: left; font-size: 0.75rem; padding: 6px 10px;" onclick="addReactionBlock('Turn ON Built-in Warning LED (Pin 13)', '    digitalWrite(13, HIGH);\n')">▶️ DO: Turn ON Pin 13 LED</button>
-                    <button class="btn" style="background: #e67e22; text-align: left; font-size: 0.75rem; padding: 6px 10px;" onclick="addReactionBlock('Turn OFF Built-in Warning LED (Pin 13)', '    digitalWrite(13, LOW);\n')">▶️ DO: Turn OFF Pin 13 LED</button>
-                    <button class="btn" style="background: #9b59b6; text-align: left; font-size: 0.75rem; padding: 6px 10px;" onclick="addReactionBlock('Wait/Delay for 1 Second (1000ms)', '    delay(1000);\n')">▶️ DO: Wait 1 Second</button>
-                </div>
+                <div id="library-blocks-tray"></div>
             </div>
             
-            <!-- Bottom Segment: Copilot Chatbot Window -->
+            <!-- FIXED Copilot Chat Window Subsystem -->
             <div id="ai-chatbot-window">
-                <div class="panel-header" style="padding: 8px 15px; font-size: 0.75rem; border-top: 1px solid #232330;">✨ Copilot Chat Assistant</div>
+                <div class="panel-header" style="padding: 10px 15px; font-size: 0.75rem; border-top: 1px solid #232330;">✨ Copilot Circuit Assistant</div>
                 <div id="chat-history">
-                    <div class="msg ai">Studio online! 🦾 Fill out your sensor properties above to build blocks instantly, or ask me any electronic circuit wiring questions!</div>
+                    <div class="msg ai">Copilot fixed! 🦾 Type a wiring question below and hit Send, or click a quick shortcut:</div>
+                    <div style="display:flex; gap:4px; padding:0 5px; flex-wrap:wrap;">
+                        <button onclick="clickFastQuestion('How do I wire the Ultrasonic Radar?')" style="background:#222; color:#00f2ff; border:1px solid #333; padding:4px 8px; font-size:0.7rem; border-radius:4px; cursor:pointer;">⚙️ Wire Radar</button>
+                        <button onclick="clickFastQuestion('How do I connect the Bluetooth module?')" style="background:#222; color:#00f2ff; border:1px solid #333; padding:4px 8px; font-size:0.7rem; border-radius:4px; cursor:pointer;">⚙️ Wire Bluetooth</button>
+                    </div>
                 </div>
                 <div class="chat-input-bar">
-                    <input type="text" id="chat-input" placeholder="Ask your copilot anything..." onkeypress="handleChatKey(event)">
-                    <button class="btn" style="padding: 8px 12px; font-size:0.8rem;" onclick="sendChatMessage()">Send</button>
+                    <input type="text" id="chatInputBox" placeholder="Ask your copilot anything..." onkeypress="handleChatKey(event)">
+                    <button class="btn" style="padding: 8px 14px; font-size:0.8rem;" onclick="sendChatMessage()">Send</button>
                 </div>
             </div>
         </div>
 
-        <!-- 2. CENTER PANEL: Dynamic Workspace Canvas Sheet -->
+        <!-- 2. CENTER PANEL: Visual Layout Grid Canvas Sheets -->
         <div id="block-builder-area">
             <div class="canvas-header">🧱 Main Programming Grid Canvas Sheets</div>
             <div class="canvas-grid" id="canvasGrid"></div>
@@ -147,12 +153,8 @@
         <!-- 3. RIGHT PANEL: Live Auto-Compiled C++ Hardware Code -->
         <div id="code-area">
             <div class="panel-header">📝 Live Compiled Arduino Code (.ino)</div>
-            <pre id="code-output">void setup() {\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  // Fill out the boxes on the left to spawn your custom sensor loops live!\n}</pre>
+            <pre id="code-output">void setup() {\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  // Click any pre-built block on the left sidebar to write your code tracks live!\n}</pre>
         </div>
     </div>
 
     <script>
-        let activeBlocks = [];
-
-        function generateCustomBlock() {
-            const name = document.getElementById('sensorName').value.trim();
