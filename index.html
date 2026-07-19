@@ -5,148 +5,190 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>robot robot Studio Pro</title>
     <style>
+        /* Modern Neon Cyberpunk Theme */
         body {
             font-family: 'Segoe UI', -apple-system, sans-serif;
             margin: 0; padding: 0;
+            background-color: #060608; color: #f0f0f5;
             display: flex; flex-direction: column;
-            height: 100vh; width: 100vw;
-            background-color: #0a0a0c; color: #f0f0f5;
-            overflow: hidden;
+            height: 100vh; width: 100vw; overflow: hidden;
         }
+        
+        /* Top Navigation App Header */
         header {
-            background: linear-gradient(90deg, #005f66 0%, #00878f 100%);
+            background: linear-gradient(90deg, #004d52 0%, #00878f 100%);
             padding: 0 25px; display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 4px 20px rgba(0, 135, 143, 0.25); height: 65px; box-sizing: border-box;
-            border-bottom: 2px solid #00f2ff; z-index: 10;
+            box-shadow: 0 4px 20px rgba(0, 135, 143, 0.3); height: 65px; box-sizing: border-box;
+            border-bottom: 2px solid #00f2ff;
         }
-        h1 { margin: 0; font-size: 1.5rem; font-weight: 700; letter-spacing: 0.5px; text-shadow: 0 0 10px rgba(0,242,255,0.6); }
+        h1 { margin: 0; font-size: 1.4rem; font-weight: 700; letter-spacing: 0.5px; text-shadow: 0 0 10px #00f2ff; }
+        
         .btn {
             background: linear-gradient(135deg, #e47128 0%, #ff8e42 100%); color: white; border: none;
             padding: 10px 20px; font-weight: bold; border-radius: 8px; font-size: 0.9rem;
             cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 10px rgba(228,113,40,0.3);
         }
         .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 15px rgba(228,113,40,0.5); }
-        
-        #workspace-container { display: flex; flex: 1; height: calc(100vh - 65px); width: 100vw; overflow: hidden; }
-        
-        /* Left Panel: Category Tabs Navigation Sidebar */
-        #category-sidebar { 
-            width: 18vw; min-width: 200px; max-width: 250px; 
-            background-color: #111116; border-right: 2px solid #1f1f2c;
-            display: flex; flex-direction: column; padding: 15px 10px; gap: 8px; overflow-y: auto;
+
+        #workspace { display: flex; flex: 1; height: calc(100vh - 65px); width: 100vw; overflow: hidden; }
+
+        /* Left Side: Control Panel & Sliders */
+        #control-panel {
+            width: 25vw; min-width: 280px; max-width: 350px;
+            background-color: #0f0f14; border-right: 2px solid #1f1f2c;
+            display: flex; flex-direction: column; padding: 20px; box-sizing: border-box; gap: 20px;
         }
-        .sidebar-header { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: #6f6f83; letter-spacing: 1px; padding-left: 8px; margin-bottom: 5px; }
-        .cat-tab { 
-            background-color: #1a1a24; color: #a0a0b5; border: 2px solid transparent; padding: 12px 14px; 
-            font-weight: bold; border-radius: 8px; cursor: pointer; text-align: left; transition: all 0.2s ease; display: flex; align-items: center; gap: 10px;
-        }
-        .cat-tab:hover { background-color: #232335; color: #fff; }
+        .panel-title { font-size: 0.8rem; font-weight: 800; text-transform: uppercase; color: #00f2ff; letter-spacing: 1px; margin-bottom: 5px; }
+        .control-group { background: #161622; padding: 15px; border-radius: 10px; border: 1px solid #232330; }
         
-        /* Center Panel: Command Blocks & Drag Canvas Space */
-        #block-builder-area { flex: 2; height: 100%; background-color: #141419; display: flex; flex-direction: column; }
-        
-        /* Dynamic Drawer that shows the items inside the clicked category */
-        .block-menu-list { 
-            background: linear-gradient(180deg, #161622 0%, #11111a 100%); padding: 15px; 
-            display: flex; gap: 10px; overflow-x: auto; border-bottom: 2px solid #1f1f2c; min-height: 65px; box-sizing: border-box;
+        /* Interactive Slider styling */
+        .slider { width: 100%; margin: 12px 0; accent-color: #e47128; cursor: pointer; }
+        .stat-display { font-size: 1.1rem; font-weight: bold; color: #fff; margin-top: 5px; }
+
+        /* Center Panel: Live Graph Display Canvas */
+        #canvas-area { flex: 2; background-color: #0b0b0e; display: flex; flex-direction: column; padding: 20px; box-sizing: border-box; }
+        #graph-container {
+            flex: 1; background: #111116; border: 2px solid #232330; border-radius: 12px;
+            position: relative; overflow: hidden; display: flex; align-items: flex-end; padding: 10px; gap: 4px;
+            background-image: radial-gradient(#252538 1px, transparent 1px); background-size: 20px 20px;
         }
-        .menu-block-item { 
-            color: white; border: none; padding: 10px 18px; font-weight: bold; 
-            border-radius: 6px; cursor: pointer; font-size: 0.85rem; white-space: nowrap;
-            transition: all 0.2s ease; box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-        }
-        .menu-block-item:hover { transform: translateY(-2px); filter: brightness(1.2); }
-        
-        /* Main Workspace Canvas target sheet */
-        .canvas-grid { 
-            flex: 1; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; 
-            background-color: #0f0f14; background-image: radial-gradient(#252538 1px, transparent 1px); background-size: 24px 24px; 
-        }
-        .kid-block { 
-            display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; 
-            border-radius: 10px; font-weight: bold; color: white; border-left: 5px solid rgba(255,255,255,0.4);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.4); animation: popIn 0.15s ease;
-        }
-        @keyframes popIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        .remove-block-btn { background: none; border: none; color: rgba(255,255,255,0.7); font-weight: bold; cursor: pointer; font-size: 1.2rem; margin-left: 15px; }
-        .remove-block-btn:hover { color: #fff; transform: scale(1.1); }
-        
-        /* Right Panel: Code Window Terminal Console */
-        #code-area { width: 24vw; min-width: 260px; background-color: #0d0d11; border-left: 2px solid #1f1f26; display: flex; flex-direction: column; }
-        pre { margin: 0; padding: 18px; flex: 1; overflow: auto; color: #5af78e; font-family: 'Fira Code', 'Consolas', monospace; font-size: 0.9rem; white-space: pre-wrap; line-height: 1.5; }
+        .graph-bar { width: 100%; background: linear-gradient(0deg, #00878f, #00f2ff); border-radius: 4px 4px 0 0; transition: height 0.1s ease; }
+        .graph-bar.alarm { background: linear-gradient(0deg, #c0392b, #ff4d4d) !important; box-shadow: 0 0 15px rgba(255,77,77,0.6); }
+
+        /* Right Panel: Live C++ Serial Terminal Monitor Output */
+        #terminal-area { width: 25vw; min-width: 280px; max-width: 350px; background-color: #070709; border-left: 2px solid #1f1f2c; display: flex; flex-direction: column; }
+        .terminal-header { background-color: #141419; padding: 12px 18px; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; color: #8f8fa3; border-bottom: 2px solid #1f1f2c; }
+        pre { margin: 0; padding: 15px; flex: 1; overflow: auto; color: #5af78e; font-family: 'Consolas', monospace; font-size: 0.85rem; white-space: pre-wrap; line-height: 1.4; }
     </style>
 </head>
 <body>
 
     <header>
         <h1>🤖 robot robot Studio Pro</h1>
-        <button class="btn" onclick="copyArduinoCode()">📋 Copy Code Matrix</button>
+        <button class="btn" onclick="copyArduinoCode()">📋 Copy Arduino C++ Code</button>
     </header>
 
-    <div id="workspace-container">
-        <!-- 1. LEFT PANEL: Expanded Category Tabs List Container -->
-        <div id="category-sidebar">
-            <div class="sidebar-header">🎮 Gaming Modules</div>
-            <button class="cat-tab" id="tab-roblox" onclick="switchCategory('roblox', '#e74c3c')">🎮 Roblox Core</button>
-            <button class="cat-tab" id="tab-minecraft" onclick="switchCategory('minecraft', '#2ecc71')">⛏️ Minecraft Mod</button>
-            <button class="cat-tab" id="tab-pokemon" onclick="switchCategory('pokemon', '#3498db')">🎒 Pokémon GO</button>
-            
-            <div class="sidebar-header" style="margin-top: 15px;">📡 Pro Wireless & Comms</div>
-            <button class="cat-tab" id="tab-bluetooth" onclick="switchCategory('bluetooth', '#00a8ff')">🔵 Bluetooth (HC-05)</button>
-            <button class="cat-tab" id="tab-wifi" onclick="switchCategory('wifi', '#9b59b6')">🌐 Wi-Fi Network</button>
-            <button class="cat-tab" id="tab-ir" onclick="switchCategory('ir', '#ff6b6b')">📺 Infrared Remote</button>
-            
-            <div class="sidebar-header" style="margin-top: 15px;">🌡️ Advanced Sensors</div>
-            <button class="cat-tab" id="tab-gyro" onclick="switchCategory('gyro', '#f1c40f')">🧭 Gyro & Tilt</button>
-            <button class="cat-tab" id="tab-env" onclick="switchCategory('env', '#1abc9c')">🌡️ Environmental</button>
-            
-            <div class="sidebar-header" style="margin-top: 15px;">🔌 Actuators & Outputs</div>
-            <button class="cat-tab" id="tab-basic" onclick="switchCategory('basic', '#00aa55')">🔌 Pins I/O</button>
-            <button class="cat-tab" id="tab-motors" onclick="switchCategory('motors', '#ff9f43')">⚙️ Robotics Servo</button>
+    <div id="workspace">
+        <!-- 1. LEFT PANEL: Controls & Threshold Toggles -->
+        <div id="control-panel">
+            <div>
+                <div class="panel-title">📡 Hardware Setup</div>
+                <div class="control-group">
+                    <label for="sensor-select" style="font-size: 0.9rem; font-weight: bold;">Select Active Hardware Sensor:</label>
+                    <select id="sensor-select" style="width: 100%; background: #0b0b0e; color: #fff; border: 1px solid #323247; padding: 8px; border-radius: 6px; margin-top: 8px; font-weight: bold;" onchange="changeSensor()">
+                        <option value="📏 Distance Radar (Ultrasonic)">📏 Distance Radar (Ultrasonic)</option>
+                        <option value="👁️ Light Eye (LDR Photocell)">👁️ Light Eye (LDR Photocell)</option>
+                        <option value="🌡️ Thermometer (DHT11)">🌡️ Thermometer (DHT11)</option>
+                        <option value="🔵 Bluetooth Packet Node">🔵 Bluetooth Packet Node</option>
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <div class="panel-title">🧠 Safety Parameters</div>
+                <div class="control-group">
+                    <label style="font-size: 0.9rem; font-weight: bold;">Adjust Alarm Threshold Limit:</label>
+                    <input type="range" class="slider" id="limitSlider" min="0" max="1000" value="600" oninput="updateSliderDisplay()">
+                    <div class="stat-display" id="sliderValDisplay">Limit Target: 600</div>
+                </div>
+            </div>
+
+            <div>
+                <div class="panel-title">🕹️ Diagnostics</div>
+                <div class="control-group" style="text-align: center;">
+                    <p style="font-size: 0.85rem; color: #a0a0b5; margin: 0 0 12px 0;">Test app calculations without real hardware connected:</p>
+                    <button class="btn" id="streamBtn" onclick="toggleDataStream()" style="width: 100%;">▶️ Start Simulation</button>
+                </div>
+            </div>
         </div>
 
-        <!-- 2. CENTER PANEL: Category Blocks Selector Tray & Canvas Sheets -->
-        <div id="block-builder-area">
-            <!-- Command block items inject dynamically inside here depending on active selection tab -->
-            <div class="block-menu-list" id="blockMenuTray"></div>
-            <div class="canvas-grid" id="canvasGrid"></div>
+        <!-- 2. CENTER PANEL: Dynamic Visual Analytics Canvas -->
+        <div id="canvas-area">
+            <div class="panel-title" style="margin-left: 5px;">📊 Live Hardware Visual Data Matrix</div>
+            <div id="graph-container">
+                <!-- Data bars automatically inject here instantly -->
+            </div>
         </div>
-        
-        <!-- 3. RIGHT PANEL: Live Compiled Code Console Output Display -->
-        <div id="code-area">
-            <div class="panel-header">📝 Live Arduino Code (.ino)</div>
-            <pre id="code-output">void setup() {\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  // Click custom category options in the sidebar to write scripts!\n}</pre>
+
+        <!-- 3. RIGHT PANEL: Automated C++ Script Compilation Code Console -->
+        <div id="terminal-area">
+            <div class="terminal-header">📝 Live Compiled Arduino Code (.ino)</div>
+            <pre id="code-output">// App engine ready. Start the simulation to compile firmware tracks...</pre>
         </div>
     </div>
 
     <script>
-        let activeBlocks = [];
-        let currentCategory = '';
+        let isStreaming = false;
+        let streamInterval = null;
+        const totalBars = 35; // Maximum capacity display tracks
+        let currentSensorName = "📏 Distance Radar (Ultrasonic)";
 
-        // Unified 1,000+ Hardware Configuration Matrix Database Storehouse
-        const blockLibrary = {
-            roblox: [
-                { id: "rb_death", text: "🎮 Roblox: On Player Death 💀", code: "  if (checkRobloxEvent(\"DEATH\")) {\n" },
-                { id: "rb_coin", text: "🎮 Roblox: On Coin Collect 🪙", code: "  if (checkRobloxEvent(\"COIN\")) {\n" },
-                { id: "rb_admin", text: "🎮 Roblox: On Admin Mode On 👑", code: "  if (checkRobloxEvent(\"ADMIN\")) {\n" }
-            ],
-            minecraft: [
-                { id: "mc_creeper", text: "⛏️ Minecraft: On Creeper Exploded 💥", code: "  if (checkMinecraftEvent(\"CREEPER\")) {\n" },
-                { id: "mc_diamond", text: "⛏️ Minecraft: On Diamond Mined 💎", code: "  if (checkMinecraftEvent(\"DIAMOND\")) {\n" },
-                { id: "mc_damage", text: "⛏️ Minecraft: On Player Damaged 💔", code: "  if (checkMinecraftEvent(\"DAMAGE\")) {\n" }
-            ],
-            pokemon: [
-                { id: "pk_pika", text: "🎒 Pokémon GO: On Pikachu Spotted ⚡", code: "  if (checkPokemonEvent(\"PIKA\")) {\n" },
-                { id: "pk_stop", text: "🎒 Pokémon GO: On PokéStop Spun 🌀", code: "  if (checkPokemonEvent(\"STOP\")) {\n" }
-            ],
-            bluetooth: [
-                { id: "bt_recv", text: "🔵 Bluetooth: IF Phone Command Received 📱", code: "  if (BluetoothSerial.available()) {\n    char btCmd = BluetoothSerial.read();\n" },
-                { id: "bt_connect", text: "🔵 Bluetooth: IF Phone Connects 🔗", code: "  if (checkBluetoothConnection()) {\n" },
-                { id: "bt_send", text: "▶️ DO: 🔵 Send Data string back to phone text log", code: "    BluetoothSerial.println(\"Hardware Tripped!\");\n" }
-            ],
-            wifi: [
-                { id: "wf_packet", text: "🌐 Wi-Fi: IF Network Web Request Received 🕸️", code: "  WiFiClient client = server.available();\n  if (client) {\n" },
-                { id: "wf_ping", text: "🌐 Wi-Fi: IF Ping latency drops below 50ms", code: "  if (checkWiFiPing() < 50) {\n" }
-            ],
-            ir: [
-                { id: "ir_btn", text: "📺 IR Remote: IF Power Button Pressed 🔴", code: "  if (IrReceiver.decode() && IrReceiver.decodedIRData.command == 0x45) {\n" },
+        // Initialize empty visual databar layout matrix container arrays
+        const graphContainer = document.getElementById('graph-container');
+        for (let i = 0; i < totalBars; i++) {
+            const bar = document.createElement('div');
+            bar.className = 'graph-bar';
+            bar.style.height = '10%'; // Flat starting floor lines
+            graphContainer.appendChild(bar);
+        }
+
+        function updateSliderDisplay() {
+            const val = document.getElementById('limitSlider').value;
+            document.getElementById('sliderValDisplay').innerText = "Limit Target: " + val;
+            generateLiveCode();
+        }
+
+        function changeSensor() {
+            currentSensorName = document.getElementById('sensor-select').value;
+            generateLiveCode();
+        }
+
+        function toggleDataStream() {
+            const btn = document.getElementById('streamBtn');
+            if (isStreaming) {
+                isStreaming = false;
+                clearInterval(streamInterval);
+                btn.innerText = "▶️ Start Simulation";
+                btn.style.background = "linear-gradient(135deg, #e47128 0%, #ff8e42 100%)";
+            } else {
+                isStreaming = true;
+                btn.innerText = "⏹️ Stop Simulation";
+                btn.style.background = "linear-gradient(135deg, #c0392b 0%, #ff4d4d 100%)";
+                streamInterval = setInterval(pushDataTelemetry, 120); // Fast sync data push cycle
+            }
+        }
+
+        function pushDataTelemetry() {
+            const bars = document.getElementsByClassName('graph-bar');
+            const limit = parseInt(document.getElementById('limitSlider').value);
+            
+            // Push values along chart array lanes leftward
+            for (let i = 0; i < bars.length - 1; i++) {
+                bars[i].style.height = bars[i+1].style.height;
+                if (bars[i+1].classList.contains('alarm')) {
+                    bars[i].classList.add('alarm');
+                } else {
+                    bars[i].classList.remove('alarm');
+                }
+            }
+
+            // Generate fresh random sensor reading index between 0 and 1000
+            let newVal = Math.floor(Math.random() * 1001);
+            let heightPercent = (newVal / 1000) * 100;
+            
+            const activeEntryBar = bars[bars.length - 1];
+            activeEntryBar.style.height = heightPercent + '%';
+
+            // Check if reading breaches user's slider setting limit threshold
+            if (newVal > limit) {
+                activeEntryBar.classList.add('alarm');
+            } else {
+                activeEntryBar.classList.remove('alarm');
+            }
+            
+            generateLiveCode(newVal, limit);
+        }
+
+        function generateLiveCode(liveVal = 0, limitVal = 600) {
+            if(!limitVal) limitVal = document.getElementById('limitSlider').value;
+            
