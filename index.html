@@ -9,186 +9,150 @@
         body {
             font-family: 'Segoe UI', -apple-system, sans-serif;
             margin: 0; padding: 0;
-            background-color: #060608; color: #f0f0f5;
             display: flex; flex-direction: column;
-            height: 100vh; width: 100vw; overflow: hidden;
+            height: 100vh; width: 100vw; background-color: #0a0a0c; color: #f0f0f5;
+            overflow: hidden;
         }
-        
-        /* Top Navigation App Header */
         header {
-            background: linear-gradient(90deg, #004d52 0%, #00878f 100%);
+            background: linear-gradient(90deg, #005f66 0%, #00878f 100%);
             padding: 0 25px; display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 4px 20px rgba(0, 135, 143, 0.3); height: 65px; box-sizing: border-box;
-            border-bottom: 2px solid #00f2ff;
+            box-shadow: 0 4px 20px rgba(0, 135, 143, 0.25); height: 65px; box-sizing: border-box;
+            border-bottom: 2px solid #00f2ff; z-index: 10;
         }
-        h1 { margin: 0; font-size: 1.4rem; font-weight: 700; letter-spacing: 0.5px; text-shadow: 0 0 10px #00f2ff; }
-        
+        h1 { margin: 0; font-size: 1.5rem; font-weight: 700; text-shadow: 0 0 10px rgba(0,242,255,0.6); }
         .btn {
             background: linear-gradient(135deg, #e47128 0%, #ff8e42 100%); color: white; border: none;
             padding: 10px 20px; font-weight: bold; border-radius: 8px; font-size: 0.9rem;
             cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 10px rgba(228,113,40,0.3);
         }
         .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 15px rgba(228,113,40,0.5); }
-
-        #workspace { display: flex; flex: 1; height: calc(100vh - 65px); width: 100vw; overflow: hidden; }
-
-        /* Left Side: Control Panel & Sliders */
-        #control-panel {
-            width: 25vw; min-width: 280px; max-width: 350px;
-            background-color: #0f0f14; border-right: 2px solid #1f1f2c;
-            display: flex; flex-direction: column; padding: 20px; box-sizing: border-box; gap: 20px;
-        }
-        .panel-title { font-size: 0.8rem; font-weight: 800; text-transform: uppercase; color: #00f2ff; letter-spacing: 1px; margin-bottom: 5px; }
-        .control-group { background: #161622; padding: 15px; border-radius: 10px; border: 1px solid #232330; }
         
-        /* Interactive Slider styling */
-        .slider { width: 100%; margin: 12px 0; accent-color: #e47128; cursor: pointer; }
-        .stat-display { font-size: 1.1rem; font-weight: bold; color: #fff; margin-top: 5px; }
-
-        /* Center Panel: Live Graph Display Canvas */
-        #canvas-area { flex: 2; background-color: #0b0b0e; display: flex; flex-direction: column; padding: 20px; box-sizing: border-box; }
-        #graph-container {
-            flex: 1; background: #111116; border: 2px solid #232330; border-radius: 12px;
-            position: relative; overflow: hidden; display: flex; align-items: flex-end; padding: 10px; gap: 4px;
-            background-image: radial-gradient(#252538 1px, transparent 1px); background-size: 20px 20px;
+        #workspace-container { display: flex; flex: 1; height: calc(100vh - 65px); width: 100vw; overflow: hidden; }
+        
+        /* Left Panel Splitter: Factory Form (Top) + Chatbot Window (Bottom) */
+        #left-control-hub {
+            width: 320px; background-color: #111116; border-right: 2px solid #1f1f2c;
+            display: flex; flex-direction: column; height: 100%; box-sizing: border-box;
         }
-        .graph-bar { width: 100%; background: linear-gradient(0deg, #00878f, #00f2ff); border-radius: 4px 4px 0 0; transition: height 0.1s ease; }
-        .graph-bar.alarm { background: linear-gradient(0deg, #c0392b, #ff4d4d) !important; box-shadow: 0 0 15px rgba(255,77,77,0.6); }
+        
+        #sensor-factory { 
+            flex: 1.2; display: flex; flex-direction: column; padding: 15px 20px; gap: 10px; 
+            overflow-y: auto; border-bottom: 2px solid #1f1f2c;
+        }
+        .sidebar-header { font-size: 0.8rem; font-weight: 800; text-transform: uppercase; color: #00f2ff; letter-spacing: 1px; margin-bottom: 2px; }
+        
+        .input-group { display: flex; flex-direction: column; gap: 4px; }
+        .input-group label { font-size: 0.8rem; font-weight: bold; color: #a0a0b5; }
+        .input-group input { 
+            background-color: #1a1a24; border: 1px solid #323247; color: #fff; padding: 8px 12px; 
+            border-radius: 6px; font-weight: bold; font-size: 0.85rem; 
+        }
+        .input-group input:focus { outline: none; border-color: #00f2ff; }
+        
+        /* High-Tech Chatbot Interface Panels */
+        #ai-chatbot-window {
+            flex: 1; display: flex; flex-direction: column; background-color: #0d0d12; box-sizing: border-box;
+        }
+        #chat-history { flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .msg { max-width: 85%; padding: 10px 14px; border-radius: 8px; font-size: 0.85rem; line-height: 1.4; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+        .msg.user { background: #00878f; align-self: flex-end; color: white; border-bottom-right-radius: 2px; }
+        .msg.ai { background-color: #1e1e24; align-self: flex-start; color: #e2e2e9; border-left: 3px solid #e47128; border-bottom-left-radius: 2px; }
+        
+        .chat-input-bar { display: flex; padding: 10px; background-color: #16161f; border-top: 1px solid #232330; gap: 6px; }
+        .chat-input-bar input { flex: 1; background-color: #0a0a0f; border: 1px solid #323247; color: white; padding: 10px; border-radius: 6px; font-size: 0.85rem; }
+        .chat-input-bar input:focus { outline: none; border-color: #00878f; }
 
-        /* Right Panel: Live C++ Serial Terminal Monitor Output */
-        #terminal-area { width: 25vw; min-width: 280px; max-width: 350px; background-color: #070709; border-left: 2px solid #1f1f2c; display: flex; flex-direction: column; }
-        .terminal-header { background-color: #141419; padding: 12px 18px; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; color: #8f8fa3; border-bottom: 2px solid #1f1f2c; }
-        pre { margin: 0; padding: 15px; flex: 1; overflow: auto; color: #5af78e; font-family: 'Consolas', monospace; font-size: 0.85rem; white-space: pre-wrap; line-height: 1.4; }
+        /* Center Panel: Main Grid Canvas Dashboard */
+        #block-builder-area { flex: 2; height: 100%; background-color: #141419; display: flex; flex-direction: column; }
+        .canvas-header { background-color: #161622; padding: 12px 20px; font-weight: bold; font-size: 0.9rem; border-bottom: 2px solid #1f1f2c; color: #8f8fa3; }
+        
+        .canvas-grid { 
+            flex: 1; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; 
+            background-color: #0f0f14; background-image: radial-gradient(#252538 1px, transparent 1px); background-size: 24px 24px; 
+        }
+        
+        /* Spawned Block Styling */
+        .kid-block { 
+            display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; 
+            border-radius: 10px; font-weight: bold; color: white; background-color: #00aa55; border-left: 5px solid rgba(255,255,255,0.4);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4); animation: popIn 0.15s ease;
+        }
+        @keyframes popIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .remove-block-btn { background: none; border: none; color: rgba(255,255,255,0.7); font-weight: bold; cursor: pointer; font-size: 1.2rem; margin-left: 15px; }
+        
+        /* Right Panel: Live Code Output Console Terminal */
+        #code-area { width: 340px; background-color: #0d0d11; border-left: 2px solid #1f1f26; display: flex; flex-direction: column; }
+        .panel-header { background-color: #1a1a24; padding: 14px 18px; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; border-bottom: 2px solid #232330; color: #8f8fa3; }
+        pre { margin: 0; padding: 18px; flex: 1; overflow: auto; color: #5af78e; font-family: 'Fira Code', 'Consolas', monospace; font-size: 0.85rem; white-space: pre-wrap; line-height: 1.5; }
     </style>
 </head>
 <body>
 
     <header>
         <h1>🤖 robot robot Studio Pro</h1>
-        <button class="btn" onclick="copyArduinoCode()">📋 Copy Arduino C++ Code</button>
+        <button class="btn" onclick="copyArduinoCode()">📋 Copy Code Matrix</button>
     </header>
 
-    <div id="workspace">
-        <!-- 1. LEFT PANEL: Controls & Threshold Toggles -->
-        <div id="control-panel">
-            <div>
-                <div class="panel-title">📡 Hardware Setup</div>
-                <div class="control-group">
-                    <label for="sensor-select" style="font-size: 0.9rem; font-weight: bold;">Select Active Hardware Sensor:</label>
-                    <select id="sensor-select" style="width: 100%; background: #0b0b0e; color: #fff; border: 1px solid #323247; padding: 8px; border-radius: 6px; margin-top: 8px; font-weight: bold;" onchange="changeSensor()">
-                        <option value="📏 Distance Radar (Ultrasonic)">📏 Distance Radar (Ultrasonic)</option>
-                        <option value="👁️ Light Eye (LDR Photocell)">👁️ Light Eye (LDR Photocell)</option>
-                        <option value="🌡️ Thermometer (DHT11)">🌡️ Thermometer (DHT11)</option>
-                        <option value="🔵 Bluetooth Packet Node">🔵 Bluetooth Packet Node</option>
-                    </select>
+    <div id="workspace-container">
+        <!-- 1. LEFT PANEL COMBINED HUB: Factory Toggles (Top) + Interactive AI Copilot (Bottom) -->
+        <div id="left-control-hub">
+            <!-- Top Segment: Sensor Factory -->
+            <div id="sensor-factory">
+                <div class="sidebar-header">🛠️ Custom Sensor Factory</div>
+                
+                <div class="input-group">
+                    <label for="sensorName">1. Type Sensor Name:</label>
+                    <input type="text" id="sensorName" placeholder="e.g., Ultrasonic Sound" value="Ultrasonic Sound">
+                </div>
+                
+                <div class="input-group">
+                    <label for="sensorPin">2. Type Target Input Pin:</label>
+                    <input type="text" id="sensorPin" placeholder="e.g., A0 or D7" value="A0">
+                </div>
+
+                <div class="input-group">
+                    <label for="sensorLimit">3. Set Danger Threshold:</label>
+                    <input type="number" id="sensorLimit" min="0" max="1023" value="600">
+                </div>
+
+                <button class="btn" style="background: linear-gradient(135deg, #00878f 0%, #00f2ff 100%); color: #000; font-weight: 800; padding: 8px; font-size:0.85rem; margin-top:5px;" onclick="generateCustomBlock()">⚡ Generate Sensor Block</button>
+                
+                <div class="sidebar-header" style="margin-top: 10px;">🔌 Standard Reactions</div>
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <button class="btn" style="background: #e67e22; text-align: left; font-size: 0.75rem; padding: 6px 10px;" onclick="addReactionBlock('Turn ON Built-in Warning LED (Pin 13)', '    digitalWrite(13, HIGH);\n')">▶️ DO: Turn ON Pin 13 LED</button>
+                    <button class="btn" style="background: #e67e22; text-align: left; font-size: 0.75rem; padding: 6px 10px;" onclick="addReactionBlock('Turn OFF Built-in Warning LED (Pin 13)', '    digitalWrite(13, LOW);\n')">▶️ DO: Turn OFF Pin 13 LED</button>
+                    <button class="btn" style="background: #9b59b6; text-align: left; font-size: 0.75rem; padding: 6px 10px;" onclick="addReactionBlock('Wait/Delay for 1 Second (1000ms)', '    delay(1000);\n')">▶️ DO: Wait 1 Second</button>
                 </div>
             </div>
-
-            <div>
-                <div class="panel-title">🧠 Safety Parameters</div>
-                <div class="control-group">
-                    <label style="font-size: 0.9rem; font-weight: bold;">Adjust Alarm Threshold Limit:</label>
-                    <input type="range" class="slider" id="limitSlider" min="0" max="1000" value="600" oninput="updateSliderDisplay()">
-                    <div class="stat-display" id="sliderValDisplay">Limit Target: 600</div>
+            
+            <!-- Bottom Segment: Copilot Chatbot Window -->
+            <div id="ai-chatbot-window">
+                <div class="panel-header" style="padding: 8px 15px; font-size: 0.75rem; border-top: 1px solid #232330;">✨ Copilot Chat Assistant</div>
+                <div id="chat-history">
+                    <div class="msg ai">Studio online! 🦾 Fill out your sensor properties above to build blocks instantly, or ask me any electronic circuit wiring questions!</div>
                 </div>
-            </div>
-
-            <div>
-                <div class="panel-title">🕹️ Diagnostics</div>
-                <div class="control-group" style="text-align: center;">
-                    <p style="font-size: 0.85rem; color: #a0a0b5; margin: 0 0 12px 0;">Test app calculations without real hardware connected:</p>
-                    <button class="btn" id="streamBtn" onclick="toggleDataStream()" style="width: 100%;">▶️ Start Simulation</button>
+                <div class="chat-input-bar">
+                    <input type="text" id="chat-input" placeholder="Ask your copilot anything..." onkeypress="handleChatKey(event)">
+                    <button class="btn" style="padding: 8px 12px; font-size:0.8rem;" onclick="sendChatMessage()">Send</button>
                 </div>
             </div>
         </div>
 
-        <!-- 2. CENTER PANEL: Dynamic Visual Analytics Canvas -->
-        <div id="canvas-area">
-            <div class="panel-title" style="margin-left: 5px;">📊 Live Hardware Visual Data Matrix</div>
-            <div id="graph-container">
-                <!-- Data bars automatically inject here instantly -->
-            </div>
+        <!-- 2. CENTER PANEL: Dynamic Workspace Canvas Sheet -->
+        <div id="block-builder-area">
+            <div class="canvas-header">🧱 Main Programming Grid Canvas Sheets</div>
+            <div class="canvas-grid" id="canvasGrid"></div>
         </div>
-
-        <!-- 3. RIGHT PANEL: Automated C++ Script Compilation Code Console -->
-        <div id="terminal-area">
-            <div class="terminal-header">📝 Live Compiled Arduino Code (.ino)</div>
-            <pre id="code-output">// App engine ready. Start the simulation to compile firmware tracks...</pre>
+        
+        <!-- 3. RIGHT PANEL: Live Auto-Compiled C++ Hardware Code -->
+        <div id="code-area">
+            <div class="panel-header">📝 Live Compiled Arduino Code (.ino)</div>
+            <pre id="code-output">void setup() {\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  // Fill out the boxes on the left to spawn your custom sensor loops live!\n}</pre>
         </div>
     </div>
 
     <script>
-        let isStreaming = false;
-        let streamInterval = null;
-        const totalBars = 35; // Maximum capacity display tracks
-        let currentSensorName = "📏 Distance Radar (Ultrasonic)";
+        let activeBlocks = [];
 
-        // Initialize empty visual databar layout matrix container arrays
-        const graphContainer = document.getElementById('graph-container');
-        for (let i = 0; i < totalBars; i++) {
-            const bar = document.createElement('div');
-            bar.className = 'graph-bar';
-            bar.style.height = '10%'; // Flat starting floor lines
-            graphContainer.appendChild(bar);
-        }
-
-        function updateSliderDisplay() {
-            const val = document.getElementById('limitSlider').value;
-            document.getElementById('sliderValDisplay').innerText = "Limit Target: " + val;
-            generateLiveCode();
-        }
-
-        function changeSensor() {
-            currentSensorName = document.getElementById('sensor-select').value;
-            generateLiveCode();
-        }
-
-        function toggleDataStream() {
-            const btn = document.getElementById('streamBtn');
-            if (isStreaming) {
-                isStreaming = false;
-                clearInterval(streamInterval);
-                btn.innerText = "▶️ Start Simulation";
-                btn.style.background = "linear-gradient(135deg, #e47128 0%, #ff8e42 100%)";
-            } else {
-                isStreaming = true;
-                btn.innerText = "⏹️ Stop Simulation";
-                btn.style.background = "linear-gradient(135deg, #c0392b 0%, #ff4d4d 100%)";
-                streamInterval = setInterval(pushDataTelemetry, 120); // Fast sync data push cycle
-            }
-        }
-
-        function pushDataTelemetry() {
-            const bars = document.getElementsByClassName('graph-bar');
-            const limit = parseInt(document.getElementById('limitSlider').value);
-            
-            // Push values along chart array lanes leftward
-            for (let i = 0; i < bars.length - 1; i++) {
-                bars[i].style.height = bars[i+1].style.height;
-                if (bars[i+1].classList.contains('alarm')) {
-                    bars[i].classList.add('alarm');
-                } else {
-                    bars[i].classList.remove('alarm');
-                }
-            }
-
-            // Generate fresh random sensor reading index between 0 and 1000
-            let newVal = Math.floor(Math.random() * 1001);
-            let heightPercent = (newVal / 1000) * 100;
-            
-            const activeEntryBar = bars[bars.length - 1];
-            activeEntryBar.style.height = heightPercent + '%';
-
-            // Check if reading breaches user's slider setting limit threshold
-            if (newVal > limit) {
-                activeEntryBar.classList.add('alarm');
-            } else {
-                activeEntryBar.classList.remove('alarm');
-            }
-            
-            generateLiveCode(newVal, limit);
-        }
-
-        function generateLiveCode(liveVal = 0, limitVal = 600) {
-            if(!limitVal) limitVal = document.getElementById('limitSlider').value;
-            
+        function generateCustomBlock() {
+            const name = document.getElementById('sensorName').value.trim();
